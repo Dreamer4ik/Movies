@@ -7,23 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		883C9FF55395BBDFB9EFA55D /* Pods_MoviesNatife.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AF6382C3B0EF1182DCC05F6 /* Pods_MoviesNatife.framework */; };
 		DFF45DCD2AE6BD7A001EA107 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF45DCC2AE6BD7A001EA107 /* AppDelegate.swift */; };
 		DFF45DCF2AE6BD7A001EA107 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF45DCE2AE6BD7A001EA107 /* SceneDelegate.swift */; };
 		DFF45DD12AE6BD7A001EA107 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF45DD02AE6BD7A001EA107 /* ViewController.swift */; };
-		DFF45DD42AE6BD7A001EA107 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFF45DD22AE6BD7A001EA107 /* Main.storyboard */; };
 		DFF45DD62AE6BD7B001EA107 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFF45DD52AE6BD7B001EA107 /* Assets.xcassets */; };
 		DFF45DD92AE6BD7B001EA107 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFF45DD72AE6BD7B001EA107 /* LaunchScreen.storyboard */; };
+		DFF45DE22AE6C457001EA107 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF45DE12AE6C457001EA107 /* Extensions.swift */; };
+		DFF45DEA2AE6C948001EA107 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF45DE92AE6C948001EA107 /* Utilities.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		84099F9D17535CAB4F0F6AB2 /* Pods-MoviesNatife.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoviesNatife.debug.xcconfig"; path = "Target Support Files/Pods-MoviesNatife/Pods-MoviesNatife.debug.xcconfig"; sourceTree = "<group>"; };
+		8AF6382C3B0EF1182DCC05F6 /* Pods_MoviesNatife.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MoviesNatife.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B190B3AAF3DB19BE49450B85 /* Pods-MoviesNatife.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoviesNatife.release.xcconfig"; path = "Target Support Files/Pods-MoviesNatife/Pods-MoviesNatife.release.xcconfig"; sourceTree = "<group>"; };
 		DFF45DC92AE6BD7A001EA107 /* MoviesNatife.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoviesNatife.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFF45DCC2AE6BD7A001EA107 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DFF45DCE2AE6BD7A001EA107 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		DFF45DD02AE6BD7A001EA107 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		DFF45DD32AE6BD7A001EA107 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		DFF45DD52AE6BD7B001EA107 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DFF45DD82AE6BD7B001EA107 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DFF45DDA2AE6BD7B001EA107 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DFF45DE12AE6C457001EA107 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		DFF45DE92AE6C948001EA107 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,17 +37,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				883C9FF55395BBDFB9EFA55D /* Pods_MoviesNatife.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		60E5A473C0F3A09EFC55163C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8AF6382C3B0EF1182DCC05F6 /* Pods_MoviesNatife.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		DFF45DC02AE6BD7A001EA107 = {
 			isa = PBXGroup;
 			children = (
 				DFF45DCB2AE6BD7A001EA107 /* MoviesNatife */,
 				DFF45DCA2AE6BD7A001EA107 /* Products */,
+				E3EF012FDFB984F400EF8511 /* Pods */,
+				60E5A473C0F3A09EFC55163C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -56,15 +73,73 @@
 		DFF45DCB2AE6BD7A001EA107 /* MoviesNatife */ = {
 			isa = PBXGroup;
 			children = (
-				DFF45DCC2AE6BD7A001EA107 /* AppDelegate.swift */,
-				DFF45DCE2AE6BD7A001EA107 /* SceneDelegate.swift */,
-				DFF45DD02AE6BD7A001EA107 /* ViewController.swift */,
-				DFF45DD22AE6BD7A001EA107 /* Main.storyboard */,
-				DFF45DD52AE6BD7B001EA107 /* Assets.xcassets */,
-				DFF45DD72AE6BD7B001EA107 /* LaunchScreen.storyboard */,
+				DFF45DE02AE6C42B001EA107 /* Utils */,
+				DFF45DE42AE6C494001EA107 /* Resources */,
+				DFF45DE82AE6C4E0001EA107 /* Models */,
+				DFF45DE72AE6C4D8001EA107 /* ViewModels */,
+				DFF45DE62AE6C4BC001EA107 /* Views */,
+				DFF45DE32AE6C47F001EA107 /* Controllers */,
 				DFF45DDA2AE6BD7B001EA107 /* Info.plist */,
 			);
 			path = MoviesNatife;
+			sourceTree = "<group>";
+		};
+		DFF45DE02AE6C42B001EA107 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				DFF45DE12AE6C457001EA107 /* Extensions.swift */,
+				DFF45DE92AE6C948001EA107 /* Utilities.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		DFF45DE32AE6C47F001EA107 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				DFF45DD02AE6BD7A001EA107 /* ViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		DFF45DE42AE6C494001EA107 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DFF45DCC2AE6BD7A001EA107 /* AppDelegate.swift */,
+				DFF45DCE2AE6BD7A001EA107 /* SceneDelegate.swift */,
+				DFF45DD52AE6BD7B001EA107 /* Assets.xcassets */,
+				DFF45DD72AE6BD7B001EA107 /* LaunchScreen.storyboard */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		DFF45DE62AE6C4BC001EA107 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		DFF45DE72AE6C4D8001EA107 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		DFF45DE82AE6C4E0001EA107 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		E3EF012FDFB984F400EF8511 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				84099F9D17535CAB4F0F6AB2 /* Pods-MoviesNatife.debug.xcconfig */,
+				B190B3AAF3DB19BE49450B85 /* Pods-MoviesNatife.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,9 +149,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DFF45DDD2AE6BD7B001EA107 /* Build configuration list for PBXNativeTarget "MoviesNatife" */;
 			buildPhases = (
+				9BCB0CDE1FFF9F5C86AE951A /* [CP] Check Pods Manifest.lock */,
 				DFF45DC52AE6BD7A001EA107 /* Sources */,
 				DFF45DC62AE6BD7A001EA107 /* Frameworks */,
 				DFF45DC72AE6BD7A001EA107 /* Resources */,
+				E4C75661218D743BB187182E /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -127,11 +204,52 @@
 			files = (
 				DFF45DD92AE6BD7B001EA107 /* LaunchScreen.storyboard in Resources */,
 				DFF45DD62AE6BD7B001EA107 /* Assets.xcassets in Resources */,
-				DFF45DD42AE6BD7A001EA107 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9BCB0CDE1FFF9F5C86AE951A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-MoviesNatife-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E4C75661218D743BB187182E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MoviesNatife/Pods-MoviesNatife-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MoviesNatife/Pods-MoviesNatife-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MoviesNatife/Pods-MoviesNatife-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		DFF45DC52AE6BD7A001EA107 /* Sources */ = {
@@ -141,20 +259,14 @@
 				DFF45DD12AE6BD7A001EA107 /* ViewController.swift in Sources */,
 				DFF45DCD2AE6BD7A001EA107 /* AppDelegate.swift in Sources */,
 				DFF45DCF2AE6BD7A001EA107 /* SceneDelegate.swift in Sources */,
+				DFF45DEA2AE6C948001EA107 /* Utilities.swift in Sources */,
+				DFF45DE22AE6C457001EA107 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		DFF45DD22AE6BD7A001EA107 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DFF45DD32AE6BD7A001EA107 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		DFF45DD72AE6BD7B001EA107 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -203,7 +315,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -218,7 +330,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -266,7 +378,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -275,7 +387,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -287,6 +399,7 @@
 		};
 		DFF45DDE2AE6BD7B001EA107 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 84099F9D17535CAB4F0F6AB2 /* Pods-MoviesNatife.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -297,9 +410,9 @@
 				INFOPLIST_FILE = MoviesNatife/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -315,6 +428,7 @@
 		};
 		DFF45DDF2AE6BD7B001EA107 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B190B3AAF3DB19BE49450B85 /* Pods-MoviesNatife.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -325,9 +439,9 @@
 				INFOPLIST_FILE = MoviesNatife/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
