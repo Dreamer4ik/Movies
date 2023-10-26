@@ -10,55 +10,126 @@ import Alamofire
 
 let httpHeaders: HTTPHeaders =  [
     "accept": "application/json",
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyNzhhYzhkZjM5MDhlODJlZTZkODU1YjYwNDJkMWZmMiIsInN1YiI6IjYyZDkzNzcwMGQ5ZjVhMDA1M2M4YjFhZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.JzzoVoplNYboBwBocwL0tdKfoaXHvs0y54N3bXfBzvc"
+    "Authorization": "Bearer \(API_KEY)"
 ]
 
 
 enum AlamofireHelperNetworkResult<T: Codable> {
     case success(T)
-    case failure(String)
+    case failure(Error)
+}
+
+enum AFError: Error {
+    case noInternetConnection
+    case failedToCreateRequest
+    case failedToGetData
+    case somethingWentWrong(String)
+    case failedToCache
 }
 
 typealias AlamofireResultCallback<T: Codable> = (AlamofireHelperNetworkResult<T>) -> Void
 
-class AlamofireHelper: NSObject {
+final class AlamofireHelper {
+    private let cacheManager = APICacheManager()
+    static let shared = AlamofireHelper() // delete url session
+    
     class func sendRequest<T: Codable>(
+          expecting type: T.Type,
+          request: MovieRequest,
+          method: HTTPMethod,
+          params: Parameters?,
+          completion: @escaping AlamofireResultCallback<T>,
+          needToShowAlertOnError: Bool = true
+      ) {
+          // Check if the response is cached
+          // FixME
+//          if let cachedData = APICacheManager.shared.cachedResponse(for: request.endpoint, url: request.urlAndToken) {
+//              do {
+//                  let result = try JSONDecoder().decode(type, from: cachedData)
+//                  completion(.success(result))
+//              } catch {
+//                  completion(.failure(AFError.failedToCache))
+//              }
+//              return
+//          }
+          
+          guard Network.reachability?.isReachable == true else {
+              completion(.failure(AFError.noInternetConnection))
+              return
+          }
+          
+          guard let urlRequest = request.urlAF else {
+              completion(.failure(AFError.failedToCreateRequest))
+              return
+          }
+
+          AF.request(urlRequest, method: method, parameters: params, encoding: URLEncoding.queryString, headers: httpHeaders)
+              .validate(statusCode: 200..<300)
+              .validate(contentType: ["application/json"])
+              .responseDecodable(of: T.self) { response in
+                  switch response.result {
+                  case .success(let value):
+                      // FixME 
+//                      if let data = response.data {
+//                          APICacheManager.shared.setCache(for: request.endpoint, url: request.urlAndToken, data: data)
+//                      }
+                      completion(.success(value))
+
+                  case .failure(let error):
+                      guard let data = response.data,
+                            let message = try? JSONDecoder().decode(String.self, from: data) else {
+                          completion(.failure(error))
+                          return
+                      }
+
+                      if needToShowAlertOnError {
+                          // Check server-side error message
+                      }
+                      completion(.failure(error))
+                  }
+              }
+      }
+    
+    public func execute<T: Codable>(
+        _ request: MovieRequest,
         expecting type: T.Type,
-        endpoint: String,
-        from viewController: UIViewController,
-        method: HTTPMethod,
-        params: Parameters?,
-        completionHandler: @escaping AlamofireResultCallback<T>,
-        needToShowAlertOnError: Bool = true
+        completion: @escaping (Result<T, Error>) -> Void
     ) {
-        guard Network.reachability?.isReachable == true else {
-            // Handle no internet connection
-            Alert.showNotice(viewController: viewController, title: "Offline", message: "You are offline. Please enable your Wi-Fi or connect using cellular data.")
+        if let cachedData = cacheManager.cachedResponse(for: request.endpoint,
+                                                        url: request.urlAndToken) {
+            do {
+                let result = try JSONDecoder().decode(type.self, from: cachedData)
+                completion(.success(result))
+            }
+            catch {
+                completion(.failure(error))
+            }
             return
         }
-        AF.request("\(baseUrl)\(endpoint)", method: method, parameters: params, encoding: URLEncoding.queryString, headers: httpHeaders)
-            .validate(statusCode: 200..<300)
-            .validate(contentType: ["application/json"])
-            .responseDecodable(of: T.self) { (response: DataResponse<T, AFError>) in
-                
-                switch response.result {
-                case .success(let value):
-                    completionHandler(.success(value))
-                    
-                case .failure(let error):
-                    guard let data = response.data,
-                          let message = try? JSONDecoder().decode(String.self, from: data) else {
-                        completionHandler(.failure(error.localizedDescription))
-                        return
-                    }
-                    
-                    if needToShowAlertOnError {
-                        // check Server Side Error Message
-                    }
-                    
-                    completionHandler(.failure(message))
-                }
+        
+        guard let urlRequest = request.url else {
+            completion(.failure(AFError.failedToCreateRequest))
+            return
+        }
+        
+        let task = URLSession.shared.dataTask(with: urlRequest) { [weak self] data, response, error in
+            guard let data = data, error == nil else {
+                completion(.failure(error ?? AFError.failedToGetData))
+                return
             }
+            
+            do {
+                let result = try JSONDecoder().decode(type.self, from: data)
+                self?.cacheManager.setCache(for: request.endpoint,
+                                            url: request.urlAndToken,
+                                            data: data)
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+        task.resume()
     }
+    
 }
 

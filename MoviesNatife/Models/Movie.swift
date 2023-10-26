@@ -9,10 +9,10 @@ import Foundation
 
 struct Movie: Codable {
     let adult: Bool
-    let backdropPath: String
+    let backdropPath: String?
     let genreIDS: [Int]
     let id: Int
-    let originalLanguage: OriginalLanguage
+    let originalLanguage: String
     let originalTitle: String
     let overview: String
     let popularity: Double
@@ -37,11 +37,4 @@ struct Movie: Codable {
         case voteAverage = "vote_average"
         case voteCount = "vote_count"
     }
-}
-
-enum OriginalLanguage: String, Codable {
-    case en = "en"
-    case es = "es"
-    case hi = "hi"
-    case ko = "ko"
 }

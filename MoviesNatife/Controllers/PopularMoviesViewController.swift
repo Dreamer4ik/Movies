@@ -17,55 +17,41 @@ enum SortingOptions {
 
 class PopularMoviesViewController: UIViewController {
     // MARK: - Properties
-    private var manager: ApiManager?
-    private var movies = [Movie]()
+//    private var manager: ApiManager?
+    private let movieListView = MovieListView()
     private var selectedSortingOption: SortingOptions = .first
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        fetchMovies()
     }
     
     // MARK: - Helpers
     private func configureUI() {
-        manager = ApiManager(viewController: self)
-        view.backgroundColor = .purple
+//        manager = ApiManager(viewController: self) // fix me this alert
+        view.backgroundColor = .systemBackground
         setUpNavBar()
+        
+        movieListView.delegate = self
+        view.addSubview(movieListView)
+        movieListView.addConstraintsToFillView(view)
     }
     
     private func setUpNavBar() {
         title = "Popular Movies"
         Utilities.configureNavBar(vc: self)
         
-        navigationController?.navigationBar.tintColor = .black
+        navigationController?.navigationBar.tintColor = .label
         
         let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
         let modifiedImage = UIImage(
             systemName: "list.dash")?
             .withConfiguration(symbolConfiguration)
-        //            .withTintColor(.black)
         
         
         let sortButton = UIBarButtonItem(image: modifiedImage, style: .plain, target: self, action: #selector(showSortingOptions))
         navigationItem.rightBarButtonItem = sortButton
-    }
-    
-    private func fetchMovies() {
-        manager?.getPopularMovies { [weak self] result in
-            switch result {
-            case .success(let models):
-                self?.movies = models.results
-                print(models.results.count)
-                print(models.results.compactMap({
-                    $0.title
-                }))
-                
-            case .failure(let error):
-                print(error.debugDescription)
-            }
-        }
     }
     
     // MARK: - Actions
@@ -92,4 +78,10 @@ class PopularMoviesViewController: UIViewController {
     }
 }
 
-
+// MARK: - MovieListViewDelegate
+extension PopularMoviesViewController: MovieListViewDelegate {
+    func movieListView(_ movieListView: MovieListView, didSelectMovie movie: Movie) {
+        // TODO: кидать загрузку через movie.id ???
+        print(movie)
+    }
+}
