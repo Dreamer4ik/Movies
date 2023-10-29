@@ -38,27 +38,16 @@ final class AlamofireHelper {
           request: MovieRequest,
           method: HTTPMethod,
           params: Parameters?,
+          appender: Int? = nil,
           completion: @escaping AlamofireResultCallback<T>,
           needToShowAlertOnError: Bool = true
       ) {
-          // Check if the response is cached
-          // FixME
-//          if let cachedData = APICacheManager.shared.cachedResponse(for: request.endpoint, url: request.urlAndToken) {
-//              do {
-//                  let result = try JSONDecoder().decode(type, from: cachedData)
-//                  completion(.success(result))
-//              } catch {
-//                  completion(.failure(AFError.failedToCache))
-//              }
-//              return
-//          }
-          
           guard Network.reachability?.isReachable == true else {
               completion(.failure(AFError.noInternetConnection))
               return
           }
           
-          guard let urlRequest = request.urlAF else {
+          guard var urlRequest = request.urlAF else {
               completion(.failure(AFError.failedToCreateRequest))
               return
           }
@@ -69,12 +58,7 @@ final class AlamofireHelper {
               .responseDecodable(of: T.self) { response in
                   switch response.result {
                   case .success(let value):
-                      // FixME 
-//                      if let data = response.data {
-//                          APICacheManager.shared.setCache(for: request.endpoint, url: request.urlAndToken, data: data)
-//                      }
                       completion(.success(value))
-
                   case .failure(let error):
                       guard let data = response.data,
                             let message = try? JSONDecoder().decode(String.self, from: data) else {
@@ -85,51 +69,10 @@ final class AlamofireHelper {
                       if needToShowAlertOnError {
                           // Check server-side error message
                       }
-                      completion(.failure(error))
+                      completion(.failure(AFError.somethingWentWrong(message)))
                   }
               }
       }
-    
-    public func execute<T: Codable>(
-        _ request: MovieRequest,
-        expecting type: T.Type,
-        completion: @escaping (Result<T, Error>) -> Void
-    ) {
-        if let cachedData = cacheManager.cachedResponse(for: request.endpoint,
-                                                        url: request.urlAndToken) {
-            do {
-                let result = try JSONDecoder().decode(type.self, from: cachedData)
-                completion(.success(result))
-            }
-            catch {
-                completion(.failure(error))
-            }
-            return
-        }
-        
-        guard let urlRequest = request.url else {
-            completion(.failure(AFError.failedToCreateRequest))
-            return
-        }
-        
-        let task = URLSession.shared.dataTask(with: urlRequest) { [weak self] data, response, error in
-            guard let data = data, error == nil else {
-                completion(.failure(error ?? AFError.failedToGetData))
-                return
-            }
-            
-            do {
-                let result = try JSONDecoder().decode(type.self, from: data)
-                self?.cacheManager.setCache(for: request.endpoint,
-                                            url: request.urlAndToken,
-                                            data: data)
-                completion(.success(result))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-        task.resume()
-    }
     
 }
 

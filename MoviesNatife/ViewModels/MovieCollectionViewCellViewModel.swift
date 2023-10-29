@@ -13,8 +13,8 @@ final class MovieCollectionViewCellViewModel: Hashable, Equatable {
     private let movieTitle: String
     private let releaseDate: String
     public let genreIDS: [Int]
-    public let rating: Double
-    public let movieImageUrl: URL? // fixme make private
+    private let rating: Double
+    private let movieImageUrl: URL?
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -52,6 +52,12 @@ final class MovieCollectionViewCellViewModel: Hashable, Equatable {
         } else {
             return "None"
         }
+    }
+    
+    
+    public var roundedRating: String {
+        let roundedRating = (rating * 10).rounded() / 10
+        return String(format: "%.1f", roundedRating)
     }
     
     public func fetchImage(completion: @escaping (Result<Data, Error>) -> Void) {

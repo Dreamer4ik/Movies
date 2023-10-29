@@ -12,13 +12,16 @@ protocol MovieListViewDelegate: AnyObject {
         _ movieListView: MovieListView,
         didSelectMovie movie: Movie
     )
+    
+    func didChangeSortingOption(_ sortingOption: SortingOptions)
 }
 /// View that handles showing list of movies, loader, etc.
 final class MovieListView: UIView {
     // MARK: - Properties
-    public weak var delegate: MovieListViewDelegate?
+    weak var delegate: MovieListViewDelegate?
     private let viewModel = MovieListViewViewModel()
     private let searchInputView = MovieSearchInputView()
+    private let noResultsView = MovieNoSearchResultsView()
     
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .large)
@@ -51,6 +54,7 @@ final class MovieListView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
+        setUpHandlers(viewModel: viewModel)
         viewModel.fetchMovies()
     }
     
@@ -61,7 +65,7 @@ final class MovieListView: UIView {
     // MARK: - Helpers
     private func configureUI() {
         backgroundColor = .systemBackground
-        addSubviews(searchInputView, collectionView, spinner)
+        addSubviews(searchInputView, collectionView, noResultsView, spinner)
         spinner.center(inView: self)
         spinner.setDimensions(width: 100, height: 100)
         spinner.startAnimating()
@@ -70,6 +74,10 @@ final class MovieListView: UIView {
         searchInputView.delegate = self
         
         collectionView.anchor(top: searchInputView.bottomAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor)
+        
+        noResultsView.center(inView: self)
+        noResultsView.setDimensions(width: 200, height: 240)
+        noResultsView.delegate = self
         
         setUpCollectionView()
         viewModel.delegate = self
@@ -82,9 +90,30 @@ final class MovieListView: UIView {
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
     }
     
+    private func setUpHandlers(viewModel: MovieListViewViewModel) {
+        viewModel.registerSearchResultHandler { [weak self]  in
+            DispatchQueue.main.async {
+                self?.collectionView.isHidden = false
+                self?.noResultsView.isHidden = true
+                let animator = UIViewPropertyAnimator(duration: 0.4, curve: .linear) {
+                    self?.collectionView.alpha = 1
+                }
+                animator.startAnimation()
+            }
+        }
+        
+        viewModel.registerNoResultsHandler { [weak self] in
+            DispatchQueue.main.async {
+                self?.noResultsView.isHidden = false
+                self?.collectionView.isHidden = true
+            }
+        }
+    }
+    
     // MARK: - Actions
     @objc private func handleRefresh() {
         refreshControl.beginRefreshing()
+        viewModel.viewMode = .regular
         viewModel.reloadMovies()
     }
     
@@ -95,26 +124,29 @@ final class MovieListView: UIView {
 
 // MARK: - MovieListViewViewModelDelegate
 extension MovieListView: MovieListViewViewModelDelegate {
+    func didChangeSortingOption(_ sortingOption: SortingOptions) {
+        viewModel.updateSortingOption(sortingOption)
+    }
+    
     func didReloadMovies() {
         collectionView.reloadData()
         refreshControl.endRefreshing()
+        spinner.stopAnimating()
     }
     
     func didSelectMovie(_ movie: Movie) {
         delegate?.movieListView(self, didSelectMovie: movie)
     }
     
-    func didLoadMoreMovies(with newIndexPaths: [IndexPath]) {
-        collectionView.performBatchUpdates {
-            print("newIndexPaths: \(newIndexPaths)")
-            collectionView.insertItems(at: newIndexPaths)
-        }
+    func didLoadMoreMovies() {
+        collectionView.reloadData()
     }
     
     func didLoadInitialMovies() {
         spinner.stopAnimating()
-        collectionView.isHidden = false
         collectionView.reloadData()
+        collectionView.isHidden = false
+       
         
         let animator = UIViewPropertyAnimator(duration: 0.4, curve: .linear) {
             self.collectionView.alpha = 1
@@ -127,9 +159,24 @@ extension MovieListView: MovieListViewViewModelDelegate {
 extension MovieListView: MovieSearchInputViewDelegate {
     func searchInputView(_ inputView: MovieSearchInputView, didChangeSearchText text: String) {
         print(text)
+        viewModel.set(query: text)
     }
     
     func searchInputViewDidTapSearchKeyboardButton(_ inputView: MovieSearchInputView) {
-        
+        viewModel.viewMode = .search
+        viewModel.executeSearch()
+    }
+}
+
+extension MovieListView: MovieNoSearchResultsViewDelegate {
+    func didTapReturnButton() {
+        viewModel.viewMode = .regular
+        viewModel.reloadMovies()
+        collectionView.isHidden = false
+        noResultsView.isHidden = true
+        let animator = UIViewPropertyAnimator(duration: 0.4, curve: .linear) {
+            self.collectionView.alpha = 1
+        }
+        animator.startAnimation()
     }
 }

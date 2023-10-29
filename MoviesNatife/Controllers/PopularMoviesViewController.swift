@@ -7,19 +7,18 @@
 
 import UIKit
 
-enum SortingOptions {
+enum SortingOptions: CaseIterable {
     case first
     case second
     case third
     case forth
 }
 
-
 class PopularMoviesViewController: UIViewController {
     // MARK: - Properties
-//    private var manager: ApiManager?
     private let movieListView = MovieListView()
     private var selectedSortingOption: SortingOptions = .first
+    
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -29,7 +28,6 @@ class PopularMoviesViewController: UIViewController {
     
     // MARK: - Helpers
     private func configureUI() {
-//        manager = ApiManager(viewController: self) // fix me this alert
         view.backgroundColor = .systemBackground
         setUpNavBar()
         
@@ -54,34 +52,46 @@ class PopularMoviesViewController: UIViewController {
         navigationItem.rightBarButtonItem = sortButton
     }
     
-    // MARK: - Actions
-    @objc private func showSortingOptions() {
-        openSortingOptions()
-    }
-    
     func openSortingOptions() {
         let action = UIAlertController.actionSheetWithItems(items: [
-            ("Option 1 Title", SortingOptions.first),
-            ("Option 2 Title", SortingOptions.second),
-            ("Option 3 Title", SortingOptions.third),
-            ("Option 4 Title", SortingOptions.forth)
+            ("Sort by 1", SortingOptions.first),
+            ("Sort by 2", SortingOptions.second),
+            ("Sort by 3", SortingOptions.third),
+            ("Sort by 4", SortingOptions.forth)
             
         ], currentSelection: selectedSortingOption, action: { (value) in
             if let sortingOption = value as? SortingOptions {
                 self.selectedSortingOption = sortingOption
-                //TODO: Update UI or perform any other necessary actions here
+                self.movieListView.didChangeSortingOption(sortingOption)
             }
         })
         
         action.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         self.present(action, animated: true, completion: nil)
     }
+    // MARK: - Actions
+    @objc private func showSortingOptions() {
+        openSortingOptions()
+    }
+    
+   
 }
 
 // MARK: - MovieListViewDelegate
 extension PopularMoviesViewController: MovieListViewDelegate {
+    func didChangeSortingOption(_ sortingOption: SortingOptions) {
+        print(sortingOption)
+    }
+    
     func movieListView(_ movieListView: MovieListView, didSelectMovie movie: Movie) {
-        // TODO: кидать загрузку через movie.id ???
-        print(movie)
+        ApiManager.shared.fetchMovieById(id: movie.id) { [weak self] result in
+            switch result {
+            case .success(let movie):
+                let vc = MovieDetailsViewController()
+                self?.navigationController?.pushViewController(vc, animated: true)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
 }

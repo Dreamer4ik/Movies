@@ -127,5 +127,10 @@ final class MovieRequest {
 extension MovieRequest {
     static let listPopularMoviesRequest = MovieRequest(endpoint: .popularMovies)
     static let listOfMoviesGenres = MovieRequest(endpoint: .genresOfMovies)
+    static let searchForMovies = MovieRequest(endpoint: .searchMoviesByTitle)
+//    static let fetchMovieById = MovieRequest(endpoint: .fetchMovieById)
+    static func fetchMovieByIdRequest(movieID: Int) -> MovieRequest {
+        return MovieRequest(endpoint: .fetchMovieById, pathComponents: [String(movieID)])
+    }
 }
 

@@ -11,12 +11,12 @@ import Alamofire
 class AlamofireImageLoader {
     static let shared = AlamofireImageLoader()
     
-    private var imageDataCache = NSCache<NSString, NSData>()
+//    private var imageDataCache = NSCache<NSString, NSData>()
     
     private init() {}
     
     func loadImage(from url: URL, completion: @escaping (Result<Data, Error>) -> Void) {
-        let key = url.absoluteString as NSString
+//        let key = url.absoluteString as NSString
         
         // FixMe
 //        if let data = imageDataCache.object(forKey: key) {

@@ -16,12 +16,14 @@ final class MovieCollectionViewCell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 8
         return imageView
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .label
+//        label.textColor = .label
+        label.textColor = .white
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.numberOfLines = 2
         return label
@@ -38,7 +40,7 @@ final class MovieCollectionViewCell: UICollectionViewCell {
     
     private let ratingLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .secondaryLabel
+        label.textColor = .white
         label.font = .systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
@@ -75,6 +77,8 @@ final class MovieCollectionViewCell: UICollectionViewCell {
     // MARK: - Helpers
     private func configureUI() {
         contentView.backgroundColor = .secondarySystemBackground
+//        contentView.clipsToBounds = true
+        contentView.layer.cornerRadius = 8
         setUpLayer()
         
         contentView.addSubviews(imageView, titleLabel, ratingIcon, ratingLabel, genresLabel)
@@ -82,7 +86,7 @@ final class MovieCollectionViewCell: UICollectionViewCell {
         imageView.addConstraintsToFillView(self)
         titleLabel.anchor(top: contentView.topAnchor, left: contentView.leftAnchor, right: contentView.rightAnchor, paddingTop: 12, paddingLeft: 10, paddingRight: 10)
         
-        ratingIcon.anchor(bottom: contentView.bottomAnchor, right: contentView.rightAnchor, paddingBottom: 30, paddingRight: 30)
+        ratingIcon.anchor(bottom: contentView.bottomAnchor, right: contentView.rightAnchor, paddingBottom: 30, paddingRight: 35)
         
         ratingLabel.centerY(inView: ratingIcon)
         ratingLabel.anchor(left: ratingIcon.rightAnchor, bottom: contentView.bottomAnchor, paddingBottom: 30, paddingRight: 2)
@@ -90,11 +94,13 @@ final class MovieCollectionViewCell: UICollectionViewCell {
     }
     
     private func setUpLayer() {
-        contentView.layer.cornerRadius = 8
         contentView.layer.shadowColor = UIColor.label.cgColor
-        contentView.layer.shadowRadius = 4
-        contentView.layer.shadowOffset = CGSize(width: -4, height: 4)
-        contentView.layer.shadowOpacity = 0.3
+        contentView.layer.shadowRadius = 5
+        contentView.layer.shadowOffset = CGSize(width: 2, height: 2)
+        contentView.layer.shadowOpacity = 1
+        contentView.layer.shadowPath = UIBezierPath(rect: contentView.bounds).cgPath
+        contentView.layer.shouldRasterize = true
+        contentView.layer.rasterizationScale = UIScreen.main.scale
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -104,7 +110,7 @@ final class MovieCollectionViewCell: UICollectionViewCell {
     
         public func configure(with viewModel: MovieCollectionViewCellViewModel) {
             titleLabel.text = "\(viewModel.movieTitleText)"
-            ratingLabel.text = "\(viewModel.rating)"
+            ratingLabel.text = "\(viewModel.roundedRating)"
             
     
             viewModel.fetchImage { [weak self] result in

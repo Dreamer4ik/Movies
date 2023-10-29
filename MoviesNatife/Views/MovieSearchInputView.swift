@@ -49,7 +49,7 @@ final class MovieSearchInputView: UIView {
         let toolbar = UIToolbar()
         toolbar.barStyle = .default
         toolbar.isTranslucent = true
-        let doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(doneButtonTapped))
+        let doneButton = UIBarButtonItem(title: "Dismiss", style: .done, target: self, action: #selector(doneButtonTapped))
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         toolbar.setItems([flexibleSpace, doneButton], animated: false)
         toolbar.isUserInteractionEnabled = true

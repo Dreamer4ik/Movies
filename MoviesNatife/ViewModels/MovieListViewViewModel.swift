@@ -7,21 +7,30 @@
 
 import UIKit
 
+enum ViewMode {
+    case regular
+    case search
+}
+
 protocol MovieListViewViewModelDelegate: AnyObject {
     func didLoadInitialMovies()
     func didReloadMovies()
-    func didLoadMoreMovies(with newIndexPaths: [IndexPath])
+    func didLoadMoreMovies()
     func didSelectMovie(_ movie: Movie)
+    func didChangeSortingOption(_ sortingOption: SortingOptions)
 }
 
 /// View model to handle movie list view logic
 final class MovieListViewViewModel: NSObject {
-    
+    // MARK: - Properties
     weak var delegate: MovieListViewViewModelDelegate?
-//    private var manager: ApiManager?
-    
+    var viewMode: ViewMode = .regular
+    private var searchText = ""
+    private var currentRequest: MovieRequest?
     private var isLoadingMovies = false
     
+    private var searchResultHandler: (() -> Void)?
+    private var noResultsHandler: (() -> Void)?
     
     private var movies: [Movie] = [] {
         didSet {
@@ -31,7 +40,7 @@ final class MovieListViewViewModel: NSObject {
                     releaseDate: movie.releaseDate,
                     genreIDS: movie.genreIDS,
                     rating: movie.voteAverage,
-                    movieImageUrl: URL(string: "\(posterBaseUrl)\(movie.posterPath)")
+                    movieImageUrl: URL(string: "\(posterBaseUrl)\(movie.posterPath ?? "")")
                 )
                 
                 if !cellViewModels.contains(viewModel) {
@@ -44,26 +53,10 @@ final class MovieListViewViewModel: NSObject {
     private var cellViewModels: [MovieCollectionViewCellViewModel] = []
     private var resultPages: (currentPage: Int, totalPages: Int) = (0, 0)
     
+    // MARK: - API
+    
     /// Fetch initial set of movies (20)
     public func fetchMovies(reload: Bool? = nil) {
-        // Cache work
-//        AlamofireHelper.shared.execute(
-//            .listPopularMoviesRequest,
-//            expecting: MoviesResponse.self) { [weak self] result in
-//            switch result {
-//            case .success(let responseModel):
-//                let results = responseModel.results
-////                let info = responseModel.info
-////                self?.apiInfo = info
-//                self?.movies = results
-//                DispatchQueue.main.async {
-//                    self?.delegate?.didLoadInitialMovies()
-//                }
-//            case .failure(let error):
-//                print(error.localizedDescription)
-//            }
-//        }
-        
         guard !isLoadingMovies else {
             return
         }
@@ -71,32 +64,32 @@ final class MovieListViewViewModel: NSObject {
         isLoadingMovies = true
         
         // Cache doesn't work
-        ApiManager.shared.getPopularMovies { [weak self] result in
-            guard let strongSelf = self else {
-                return
-            }
-            switch result {
-            case .success(let models):
-                strongSelf.resultPages = (models.page, models.totalPages)
-                strongSelf.movies = models.results
-                print(strongSelf.movies.count)
-                print(strongSelf.cellViewModels.count)
-                if let reload = reload {
-                    DispatchQueue.main.async {
-                        strongSelf.delegate?.didReloadMovies()
-                        strongSelf.isLoadingMovies = false
-                    }
+        switch viewMode {
+        case .regular:
+            ApiManager.shared.getPopularMovies { [weak self] result in
+                guard let strongSelf = self else {
                     return
                 }
-                
-                DispatchQueue.main.async {
-                    strongSelf.delegate?.didLoadInitialMovies()
+                switch result {
+                case .success(let models):
+                    strongSelf.resultPages = (models.page, models.totalPages)
+                    strongSelf.movies = models.results
+                    
+                    DispatchQueue.main.async {
+                        if let reload = reload {
+                            strongSelf.delegate?.didReloadMovies()
+                        } else {
+                            strongSelf.delegate?.didLoadInitialMovies()
+                        }
+                        strongSelf.isLoadingMovies = false
+                    }
+                case .failure(let error):
+                    print(error.localizedDescription)
                     strongSelf.isLoadingMovies = false
                 }
-            case .failure(let error):
-                print(error.localizedDescription)
-                strongSelf.isLoadingMovies = false
             }
+        case .search:
+            executeSearch()
         }
     }
     
@@ -110,49 +103,143 @@ final class MovieListViewViewModel: NSObject {
         print("Fetching more movies")
         resultPages.currentPage += 1
         
-        ApiManager.shared.getPopularMovies(page: resultPages.currentPage) { [weak self] result in
-            guard let strongSelf = self else {
-                return
-            }
-            switch result {
-            case .success(let moviesResponse):
-                let moreMovies = moviesResponse.results
-                let originalCount = strongSelf.movies.count
-                let newCount = moreMovies.count
-                let total = originalCount + newCount
-                let startingIndex = total - newCount
-                
-                let indexPathsToAdd: [IndexPath] = Array(startingIndex..<(startingIndex + newCount)).compactMap {
-                    return IndexPath(row: $0, section: 0)
+        switch viewMode {
+        case .regular:
+            ApiManager.shared.getPopularMovies(page: resultPages.currentPage) { [weak self] result in
+                guard let strongSelf = self else {
+                    return
                 }
-                strongSelf.movies.append(contentsOf: moreMovies)
-                DispatchQueue.main.async {
-                    strongSelf.delegate?.didLoadMoreMovies(with: indexPathsToAdd)
+                switch result {
+                case .success(let moviesResponse):
+                    let moreMovies = moviesResponse.results
+                    strongSelf.movies.append(contentsOf: moreMovies)
+                    DispatchQueue.main.async {
+                        strongSelf.delegate?.didLoadMoreMovies()
+                        strongSelf.isLoadingMovies = false
+                    }
+                case .failure(let failure):
+                    print(failure.localizedDescription)
                     strongSelf.isLoadingMovies = false
                 }
-                // DEBUG
-                print("DEBUG --------------------------")
-                print("Page: \(self?.resultPages.currentPage)")
-                print("moviesResponse: \(moviesResponse.results)")
-                print("originalCount: \(originalCount)")
-                print("newCount: \(newCount)")
-                print("total: \(total)")
-                print("startingIndex: \(startingIndex)")
-                print("indexPathsToAdd: \(indexPathsToAdd)")
-                print("DEBUG --------------------------")
-            case .failure(let failure):
-                print(failure.localizedDescription)
-                strongSelf.isLoadingMovies = false
+            }
+        case .search:
+            guard let currentRequest = currentRequest else { return }
+            ApiManager.shared.fetchMoviesByTitle(page: resultPages.currentPage, request: currentRequest) { [weak self] result in
+                guard let strongSelf = self else {
+                    return
+                }
+                switch result {
+                case .success(let moviesResponse):
+                    let moreMovies = moviesResponse.results
+                    strongSelf.movies.append(contentsOf: moreMovies)
+                    DispatchQueue.main.async {
+                        strongSelf.delegate?.didLoadMoreMovies()
+                        strongSelf.isLoadingMovies = false
+                    }
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
             }
         }
     }
     
     public func reloadMovies() {
-        movies.removeAll()
-        cellViewModels.removeAll()
-        fetchMovies(reload: true)
+        switch viewMode {
+        case .regular:
+            movies.removeAll()
+            cellViewModels.removeAll()
+            fetchMovies(reload: true)
+        case .search:
+            movies.removeAll()
+            cellViewModels.removeAll()
+            DispatchQueue.main.async {
+                self.delegate?.didReloadMovies()
+            }
+        }
     }
-
+    
+    
+    // MARK: - Search
+    private func makeSearchAPICall<T: Codable>(_ type: T.Type, request: MovieRequest) {
+        ApiManager.shared.fetchMoviesByTitle(request: request) { [weak self] result in
+            switch result {
+            case .success(let model):
+                self?.processSearchResults(model: model)
+            case .failure(let failure):
+                self?.handleNoResults()
+            }
+        }
+    }
+    
+    public func executeSearch() {
+        guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return
+        }
+        // Build arguments
+        var queryParams: [URLQueryItem] = [
+            URLQueryItem(name: "query", value: searchText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed))
+        ]
+        
+        // Create request
+        let request = MovieRequest(
+            endpoint: .searchMoviesByTitle,
+            queryParameters: queryParams
+        )
+        
+        // Notify view of results, no results, error
+        currentRequest = request
+        makeSearchAPICall(MoviesResponse.self, request: request)
+    }
+    
+    private func processSearchResults(model: Codable) {
+        if let movieResults = model as? MoviesResponse, !movieResults.results.isEmpty {
+            reloadMovies()
+            movies = movieResults.results
+            resultPages = (movieResults.page, movieResults.totalPages)
+            self.handleResults()
+        } else {
+            self.handleNoResults()
+        }
+    }
+    
+    public func set(query text: String) {
+        self.searchText = text
+    }
+    
+    // MARK: - Handlers
+    
+    public func registerNoResultsHandler(_ block: @escaping () -> Void) {
+        self.noResultsHandler = block
+    }
+    
+    public func registerSearchResultHandler(_ block: @escaping () -> Void) {
+        self.searchResultHandler = block
+    }
+    
+    private func handleNoResults() {
+        noResultsHandler?()
+    }
+    
+    private func handleResults() {
+        searchResultHandler?()
+    }
+    
+    func updateSortingOption(_ sortingOption: SortingOptions) {
+        // TODO: - Сделать сортировки
+//        self.selectedSortingOption = sortingOption
+        switch sortingOption {
+        case .first:
+            print("1")
+        case .second:
+            print("2")
+        case .third:
+            print("3")
+        case .forth:
+            print("4")
+        }
+    }
+    
+    // MARK: - Helpers
     public var shouldShowLoadMoreIndicator: Bool {
         return resultPages.0 < resultPages.1 && resultPages.0 > 0
     }
@@ -210,7 +297,7 @@ extension MovieListViewViewModel: UICollectionViewDelegateFlowLayout {
         let bounds = collectionView.bounds
         let width: CGFloat
         width = (bounds.width - 30)
-        return CGSize(width: width, height: width * 0.6)
+        return CGSize(width: width, height: width * 1.3)
     }
 }
 
@@ -222,7 +309,7 @@ extension MovieListViewViewModel: UIScrollViewDelegate {
               !cellViewModels.isEmpty else {
             return
         }
-         
+        
         let height = scrollView.frame.size.height
         let contentYoffset = scrollView.contentOffset.y
         let distanceFromBottom = scrollView.contentSize.height - contentYoffset

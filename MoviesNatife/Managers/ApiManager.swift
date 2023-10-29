@@ -57,4 +57,32 @@ class ApiManager: NSObject {
             }
         }
     }
+    
+    func fetchMoviesByTitle(page: Int? = nil, request: MovieRequest, completionHandler: @escaping ApiManagerCallback<MoviesResponse>) {
+        var updatedParams = params
+        if let page = page {
+            updatedParams["page"] = "\(page)"
+        }
+        AlamofireHelper.sendRequest(expecting: MoviesResponse.self, request: request, method: .get, params: updatedParams) { (result: AlamofireHelperNetworkResult<MoviesResponse>) in
+            switch result {
+            case .success(let movies):
+                completionHandler(.success(movies))
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+    
+    func fetchMovieById(id: Int, completionHandler: @escaping ApiManagerCallback<MovieDetails>) {
+        let request = MovieRequest.fetchMovieByIdRequest(movieID: id)
+        AlamofireHelper.sendRequest(expecting: MovieDetails.self, request: request, method: .get, params: params) { (result: AlamofireHelperNetworkResult<MovieDetails>) in
+            switch result {
+            case .success(let movie):
+                completionHandler(.success(movie))
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+    
 }
