@@ -119,6 +119,28 @@ extension UIView {
     }
 }
 
+extension UIViewController {
+    var navigationBarBottom: CGFloat {
+        if let height = self.navigationController?.navigationBar.frame.height,
+           let originY = self.navigationController?.navigationBar.frame.origin.y {
+            return height + originY
+        }
+        return 0.0
+    }
+}
+
+extension UIScrollView {
+    func fitSizeOfContent() {
+        var contentRect = CGRect.zero
+        
+        for view in subviews {
+            contentRect = contentRect.union(view.frame)
+        }
+        
+        contentSize = CGSize(width: frame.size.width, height: contentRect.size.height + contentInset.top + contentInset.bottom)
+    }
+}
+
 extension UIAlertController {
     static func actionSheetWithItems<A : Equatable>(items : [(title : String, value : A)], currentSelection : A? = nil, action : @escaping (A) -> Void) -> UIAlertController {
         let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)

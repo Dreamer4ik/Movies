@@ -87,7 +87,8 @@ extension PopularMoviesViewController: MovieListViewDelegate {
         ApiManager.shared.fetchMovieById(id: movie.id) { [weak self] result in
             switch result {
             case .success(let movie):
-                let vc = MovieDetailsViewController()
+                let vm = MovieDetailViewViewModel(movie: movie)
+                let vc = MovieDetailsViewController(viewModel: vm)
                 self?.navigationController?.pushViewController(vc, animated: true)
             case .failure(let error):
                 print(error.localizedDescription)

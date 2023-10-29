@@ -22,16 +22,14 @@ final class MovieCollectionViewCell: UICollectionViewCell {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-//        label.textColor = .label
         label.textColor = .white
-        label.font = .systemFont(ofSize: 18, weight: .semibold)
+        label.font = .systemFont(ofSize: 20, weight: .bold)
         label.numberOfLines = 2
         return label
     }()
     
     private let genresLabel: UILabel = {
         let label = UILabel()
-//        label.textColor = .secondaryLabel
         label.textColor = .white
         label.font = .systemFont(ofSize: 16, weight: .semibold)
         label.numberOfLines = 2
@@ -77,7 +75,6 @@ final class MovieCollectionViewCell: UICollectionViewCell {
     // MARK: - Helpers
     private func configureUI() {
         contentView.backgroundColor = .secondarySystemBackground
-//        contentView.clipsToBounds = true
         contentView.layer.cornerRadius = 8
         setUpLayer()
         
@@ -91,6 +88,8 @@ final class MovieCollectionViewCell: UICollectionViewCell {
         ratingLabel.centerY(inView: ratingIcon)
         ratingLabel.anchor(left: ratingIcon.rightAnchor, bottom: contentView.bottomAnchor, paddingBottom: 30, paddingRight: 2)
         genresLabel.anchor(top: ratingLabel.topAnchor, left: titleLabel.leftAnchor, right: ratingIcon.leftAnchor, paddingRight: 8)
+        
+        addGradient()
     }
     
     private func setUpLayer() {
@@ -103,48 +102,69 @@ final class MovieCollectionViewCell: UICollectionViewCell {
         contentView.layer.rasterizationScale = UIScreen.main.scale
     }
     
+    private func addGradient() {
+        configureTopGradientLayer()
+        configureBottomGradientLayer()
+    }
+    
+    private func configureTopGradientLayer() {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = CGRect(x: 0, y: 0, width: contentView.bounds.width, height: contentView.bounds.height * 0.15)
+        gradientLayer.colors = [UIColor.black.cgColor, UIColor.clear.cgColor]
+        gradientLayer.locations = [0, 1]
+        imageView.layer.addSublayer(gradientLayer)
+    }
+    
+    private func configureBottomGradientLayer() {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = CGRect(x: 0, y: contentView.bounds.height * 0.85, width: contentView.bounds.width, height: contentView.bounds.height * 0.15)
+        gradientLayer.colors = [UIColor.clear.cgColor, UIColor.black.cgColor]
+        gradientLayer.locations = [0, 1]
+        imageView.layer.addSublayer(gradientLayer)
+    }
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         setUpLayer()
     }
     
-        public func configure(with viewModel: MovieCollectionViewCellViewModel) {
-            titleLabel.text = "\(viewModel.movieTitleText)"
-            ratingLabel.text = "\(viewModel.roundedRating)"
-            
-    
-            viewModel.fetchImage { [weak self] result in
-                switch result {
-                case .success(let data):
-                    DispatchQueue.main.async {
-                        self?.imageView.image = UIImage(data: data)
-                    }
-                case .failure(let error):
-                    print(error.localizedDescription)
+    public func configure(with viewModel: MovieCollectionViewCellViewModel) {
+        titleLabel.text = "\(viewModel.movieTitleText)"
+        ratingLabel.text = "\(viewModel.roundedRating)"
+        
+        
+        viewModel.fetchImage { [weak self] result in
+            switch result {
+            case .success(let data):
+                DispatchQueue.main.async {
+                    self?.imageView.image = UIImage(data: data)
                 }
-            }
-            
-            viewModel.fetchGenres { [weak self] result in
-                switch result {
-                case .success(let model):
-                    let matchingGenres = model.genres.filter { genre in
-                        return viewModel.genreIDS.contains(genre.id)
-                    }
-                    let matchingGenreNames = matchingGenres.map { $0.name }
-                    let genreNames: String
-                    if !matchingGenreNames.isEmpty {
-                        genreNames = matchingGenreNames.joined(separator: ", ")
-                        
-                    } else {
-                        genreNames = "No Genre"
-                    }
-                    
-                    DispatchQueue.main.async {
-                        self?.genresLabel.text = "\(genreNames)"
-                    }
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
+            case .failure(let error):
+                print(error.localizedDescription)
             }
         }
+        
+        viewModel.fetchGenres { [weak self] result in
+            switch result {
+            case .success(let model):
+                let matchingGenres = model.genres.filter { genre in
+                    return viewModel.genreIDS.contains(genre.id)
+                }
+                let matchingGenreNames = matchingGenres.map { $0.name }
+                let genreNames: String
+                if !matchingGenreNames.isEmpty {
+                    genreNames = matchingGenreNames.joined(separator: ", ")
+                    
+                } else {
+                    genreNames = "No Genre"
+                }
+                
+                DispatchQueue.main.async {
+                    self?.genresLabel.text = "\(genreNames)"
+                }
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
 }
