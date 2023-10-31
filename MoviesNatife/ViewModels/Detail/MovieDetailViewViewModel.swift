@@ -8,22 +8,54 @@
 import UIKit
 
 final class MovieDetailViewViewModel {
+    // MARK: - Properties
     private let movie: MovieDetails
-//    public var episodes: [String] {
-//        character.episode
-//    }
+    public let trailerURL: URL?
     
     // MARK: - Lifecycle
-    
-    init(movie: MovieDetails) {
+    init(movie: MovieDetails, trailerURL: URL?) {
         self.movie = movie
+        self.trailerURL = trailerURL
     }
-    
-//    private var requestURL: URL? {
-//        return URL(string: character.url)
-//    }
     
     public var title: String {
         return movie.title
+    }
+    
+    public var trailerButtonIsHidden: Bool {
+        return trailerURL == nil
+    }
+    
+    public var imageImgeUrl: URL? {
+        return URL(string: "\(posterBaseUrl)\(movie.posterPath)")
+    }
+    
+    public var countryAndYear: String {
+        let originCountry = movie.productionCompanies.first?.originCountry ?? "Unknown"
+        return "\(originCountry), \(releaseDateText)"
+    }
+    
+    public var releaseDateText: String {
+        if let date = Utilities.dateFormatter().date(from: movie.releaseDate) {
+            let yearFormatter = DateFormatter()
+            yearFormatter.dateFormat = "yyyy"
+            let year = yearFormatter.string(from: date)
+            return year
+        } else {
+            return "None"
+        }
+    }
+    
+    public var descriptionText: String {
+        return movie.overview
+    }
+    
+    public var roundedRating: String {
+        let roundedRating = (movie.voteAverage * 10).rounded() / 10
+        return String(format: "%.1f", roundedRating)
+    }
+    
+    public var genres: String {
+        return movie.genres.map { $0.name }.joined(separator: ", ")
     }
 }

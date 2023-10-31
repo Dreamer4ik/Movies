@@ -73,12 +73,24 @@ class ApiManager: NSObject {
         }
     }
     
-    func fetchMovieById(id: Int, completionHandler: @escaping ApiManagerCallback<MovieDetails>) {
+    func fetchMovieDetailsById(id: Int, completionHandler: @escaping ApiManagerCallback<MovieDetails>) {
         let request = MovieRequest.fetchMovieByIdRequest(movieID: id)
         AlamofireHelper.sendRequest(expecting: MovieDetails.self, request: request, method: .get, params: params) { (result: AlamofireHelperNetworkResult<MovieDetails>) in
             switch result {
             case .success(let movie):
                 completionHandler(.success(movie))
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+    
+    func fetchMovieVideosById(id: Int, completionHandler: @escaping ApiManagerCallback<VideoResponse>) {
+        let request = MovieRequest(endpoint: .fetchMovieById, pathComponents: [String(id), "videos"])
+        AlamofireHelper.sendRequest(expecting: VideoResponse.self, request: request, method: .get, params: params) { (result: AlamofireHelperNetworkResult<VideoResponse>) in
+            switch result {
+            case .success(let videos):
+                completionHandler(.success(videos))
             case .failure(let error):
                 completionHandler(.failure(error))
             }

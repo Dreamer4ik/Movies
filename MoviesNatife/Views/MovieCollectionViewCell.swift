@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 /// Single cell for a movie
 final class MovieCollectionViewCell: UICollectionViewCell {
@@ -131,18 +132,7 @@ final class MovieCollectionViewCell: UICollectionViewCell {
     public func configure(with viewModel: MovieCollectionViewCellViewModel) {
         titleLabel.text = "\(viewModel.movieTitleText)"
         ratingLabel.text = "\(viewModel.roundedRating)"
-        
-        
-        viewModel.fetchImage { [weak self] result in
-            switch result {
-            case .success(let data):
-                DispatchQueue.main.async {
-                    self?.imageView.image = UIImage(data: data)
-                }
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
+        imageView.sd_setImage(with: viewModel.imageURL, completed: nil)
         
         viewModel.fetchGenres { [weak self] result in
             switch result {

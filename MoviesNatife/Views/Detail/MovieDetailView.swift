@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 protocol MovieDetailViewDelegate: AnyObject {
     func didTapTrailerButton()
@@ -26,14 +27,13 @@ final class MovieDetailView: UIView {
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.image = UIImage(systemName: "photo.artframe")
+        imageView.clipsToBounds = true
         return imageView
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 18, weight: .semibold)
-        label.text = "Film Title"
         label.numberOfLines = 2
         return label
     }()
@@ -41,7 +41,6 @@ final class MovieDetailView: UIView {
     private let yearAndCountryLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14)
-        label.text = "US, 2031"
         return label
     }()
     
@@ -49,7 +48,6 @@ final class MovieDetailView: UIView {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16)
         label.numberOfLines = 2
-        label.text = "Comedy"
         return label
     }()
     
@@ -57,14 +55,12 @@ final class MovieDetailView: UIView {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16)
         label.numberOfLines = 0
-        label.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vulputate eros ac nisi imperdiet, sit amet tristique turpis tristique. Donec non accumsan felis, ac finibus turpis. Quisque lectus ante, viverra sit amet lacus pulvinar, dignissim lacinia nisl. Morbi et nibh ac mauris condimentum fermentum a pretium ligula. Nam aliquam ullamcorper nisi, sed vulputate lectus luctus a. Ut auctor nisl id libero rutrum molestie. Etiam ut est vel quam lobortis lacinia quis a nulla.  Etiam viverra pharetra interdum. Maecenas in velit risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam tempus aliquet erat, non pellentesque erat porttitor sed. In pulvinar eleifend mi a tristique. Pellentesque dui elit, interdum pharetra vehicula sodales, gravida quis dolor. Integer placerat diam mi, et ultricies purus tincidunt et. Sed viverra ipsum lacus, tempor fringilla massa facilisis a. Proin orci tortor, mollis ut sem et, pharetra mollis nisi. Nullam elementum justo nec tortor egestas hendrerit ut vitae massa. Vestibulum sollicitudin, sem quis tincidunt aliquet, est quam varius purus, eget pellentesque dolor enim in nibh. Phasellus imperdiet viverra lorem, eget vehicula elit vestibulum id. Cras a magna libero. Suspendisse tincidunt vestibulum justo, sit amet imperdiet lectus venenatis a. Curabitur nisl turpis, sollicitudin iaculis blandit ut, semper non velit. Morbi congue eu ipsum eu dignissim. Aenean maximus faucibus lectus. Pellentesque tellus augue, gravida in auctor non, hendrerit sed nisi. Vivamus eu leo eu lorem consequat ornare id non odio. In hac habitasse platea dictumst. Praesent in faucibus orci. Fusce laoreet, est at interdum elementum, nisi sapien mollis nisl, vitae dictum ante velit ut augue. Quisque laoreet egestas varius. Pellentesque id euismod augue. Sed in consequat metus.Sed ullamcorper dapibus ex, nec tincidunt purus consequat rhoncus. Nunc eu diam vestibulum, convallis nisi id, bibendum mi. Maecenas feugiat tellus mi, sed rutrum libero pellentesque bibendum. Donec consectetur pellentesque est at molestie. Nulla eget massa vel sem lacinia dapibus. Ut interdum leo non ultrices elementum. Quisque et erat varius diam laoreet porta. Praesent tempus porttitor orci quis accumsan. Ut iaculis sollicitudin neque a posuere. Nam fermentum felis non neque suscipit rhoncus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Mauris accumsan, odio et interdum egestas, dui eros laoreet urna, eget consectetur massa sapien id dui. Praesent et ante nec arcu dictum congue vel consectetur lacus. Integer sagittis neque non vehicula accumsan. Duis ac velit orci. Vivamus sem nunc, pharetra nec bibendum at, rutrum in ligula. Fusce varius eget risus convallis pharetra. Cras elit sem, tincidunt quis sollicitudin in, tempus ac lectus. Sed libero est, ornare sit amet orci sed, hendrerit egestas erat. Nam varius lacinia est ac consequat. Integer sollicitudin aliquam mi, sit amet finibus risus mattis sollicitudin. Integer hendrerit, massa ut tincidunt pharetra, dolor felis vulputate dui, at venenatis arcu mauris vel massa. Donec id nisi vel eros viverra commodo accumsan at risus.Fusce ut nulla quam. Praesent sodales, lectus nec viverra blandit, urna magna varius est, eu varius nibh magna eu arcu. Curabitur vitae consectetur nisl, a convallis nunc. Sed blandit est dui, ac accumsan nisl facilisis"
         return label
     }()
     
     private let ratingLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .semibold)
-        label.text = "Rating: 8.0"
         return label
     }()
     
@@ -105,7 +101,7 @@ final class MovieDetailView: UIView {
         scrollView.addSubviews(posterImageView, titleLabel, yearAndCountryLabel, genresLabel, trailerButton, ratingLabel, descriptionLabel)
         
         posterImageView.centerX(inView: self)
-        posterImageView.anchor(top: scrollView.topAnchor, width: 200, height: 300)
+        posterImageView.anchor(top: scrollView.topAnchor, paddingTop: 10, width: 320, height: 400)
         
         titleLabel.anchor(top: posterImageView.bottomAnchor, left: leftAnchor, paddingTop: 16, paddingLeft: 16)
         
@@ -124,12 +120,25 @@ final class MovieDetailView: UIView {
         
         trailerButton.addTarget(self, action: #selector(didTapTrailerButton), for: .touchUpInside)
         addGesture()
+        SetUpData()
     }
     
     private func addGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapImage))
         posterImageView.addGestureRecognizer(tapGesture)
         posterImageView.isUserInteractionEnabled = true
+    }
+    
+    private func SetUpData() {
+        titleLabel.text = viewModel.title
+        yearAndCountryLabel.text = viewModel.countryAndYear
+        genresLabel.text = viewModel.genres
+        ratingLabel.text = "Rating: \(viewModel.roundedRating)"
+        descriptionLabel.text = viewModel.descriptionText
+        
+        trailerButton.isHidden = viewModel.trailerButtonIsHidden
+        
+        posterImageView.sd_setImage(with: viewModel.imageImgeUrl, completed: nil)
     }
     // MARK: - Actions
     @objc private func didTapTrailerButton() {

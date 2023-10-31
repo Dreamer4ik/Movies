@@ -44,4 +44,11 @@ enum TypeEnum: String, Codable {
     case featurette = "Featurette"
     case teaser = "Teaser"
     case trailer = "Trailer"
+    case unknown = "Unknown"
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        self = TypeEnum(rawValue: rawValue) ?? .unknown
+    }
 }

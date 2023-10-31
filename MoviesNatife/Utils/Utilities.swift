@@ -14,5 +14,13 @@ final class Utilities {
         vc.navigationItem.standardAppearance = barAppearance
         vc.navigationItem.scrollEdgeAppearance = barAppearance
     }
+    
+    static func dateFormatter() -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = .current
+        return formatter
+    }
+    
 }
 

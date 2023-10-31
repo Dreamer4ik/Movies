@@ -51,14 +51,25 @@ final class MovieDetailsViewController: UIViewController {
 extension MovieDetailsViewController: MovieDetailViewDelegate {
     func didTapImage(image: UIImage) {
         DispatchQueue.main.async {
-              let vc = ImageViewController(image: image)
-              let nav = UINavigationController(rootViewController: vc)
-              nav.modalPresentationStyle = .formSheet
-              self.present(nav, animated: true, completion: nil)
-          }
+            let vc = ImageViewController(image: image)
+            let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = .formSheet
+            self.present(nav, animated: true, completion: nil)
+        }
     }
     
     func didTapTrailerButton() {
-        print("Trailer")
+        if let videoId = extractVideoId(from: viewModel.trailerURL) {
+            let vc = VideoPlayerViewController(videoId: videoId)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    private func extractVideoId(from url: URL?) -> String? {
+        guard let urlString = url?.absoluteString, let range = urlString.range(of: "v=") else {
+            return nil
+        }
+        let videoId = urlString[range.upperBound...]
+        return String(videoId)
     }
 }

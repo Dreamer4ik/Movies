@@ -40,7 +40,7 @@ final class MovieListViewViewModel: NSObject {
                     releaseDate: movie.releaseDate,
                     genreIDS: movie.genreIDS,
                     rating: movie.voteAverage,
-                    movieImageUrl: URL(string: "\(posterBaseUrl)\(movie.posterPath ?? "")")
+                    posterPath: movie.posterPath
                 )
                 
                 if !cellViewModels.contains(viewModel) {

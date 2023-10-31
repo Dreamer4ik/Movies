@@ -18,11 +18,11 @@
 		DF342D5E2AEECBB6008DF101 /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF342D5D2AEECBB5008DF101 /* ImageViewController.swift */; };
 		DF342D602AEED256008DF101 /* VideoResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF342D5F2AEED256008DF101 /* VideoResponse.swift */; };
 		DF342D622AEED2B2008DF101 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF342D612AEED2B2008DF101 /* Video.swift */; };
-		DF96FC312AE8155D0039B4B3 /* AlamofireImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF96FC302AE8155D0039B4B3 /* AlamofireImageLoader.swift */; };
 		DF96FC332AE81B860039B4B3 /* APICacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF96FC322AE81B860039B4B3 /* APICacheManager.swift */; };
 		DF96FC372AE8293A0039B4B3 /* MovieRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF96FC362AE8293A0039B4B3 /* MovieRequest.swift */; };
 		DF96FC392AE8298C0039B4B3 /* MovieEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF96FC382AE8298C0039B4B3 /* MovieEndpoint.swift */; };
 		DF9DEFC52AEADF8D00D09D97 /* GenresResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9DEFC42AEADF8D00D09D97 /* GenresResponse.swift */; };
+		DFB2BCA42AF03DB700C81AE5 /* VideoPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB2BCA32AF03DB700C81AE5 /* VideoPlayerViewController.swift */; };
 		DFD480212AEAC26600B6C225 /* MovieSearchInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD480202AEAC26600B6C225 /* MovieSearchInputView.swift */; };
 		DFDBBA4F2AE7C24E0050F1DB /* MovieListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFDBBA4E2AE7C24E0050F1DB /* MovieListView.swift */; };
 		DFDBBA512AE7C2CC0050F1DB /* MovieCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFDBBA502AE7C2CC0050F1DB /* MovieCollectionViewCell.swift */; };
@@ -59,11 +59,11 @@
 		DF342D5D2AEECBB5008DF101 /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
 		DF342D5F2AEED256008DF101 /* VideoResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoResponse.swift; sourceTree = "<group>"; };
 		DF342D612AEED2B2008DF101 /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
-		DF96FC302AE8155D0039B4B3 /* AlamofireImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireImageLoader.swift; sourceTree = "<group>"; };
 		DF96FC322AE81B860039B4B3 /* APICacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICacheManager.swift; sourceTree = "<group>"; };
 		DF96FC362AE8293A0039B4B3 /* MovieRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieRequest.swift; sourceTree = "<group>"; };
 		DF96FC382AE8298C0039B4B3 /* MovieEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieEndpoint.swift; sourceTree = "<group>"; };
 		DF9DEFC42AEADF8D00D09D97 /* GenresResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenresResponse.swift; sourceTree = "<group>"; };
+		DFB2BCA32AF03DB700C81AE5 /* VideoPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerViewController.swift; sourceTree = "<group>"; };
 		DFD480202AEAC26600B6C225 /* MovieSearchInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieSearchInputView.swift; sourceTree = "<group>"; };
 		DFDBBA4E2AE7C24E0050F1DB /* MovieListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListView.swift; sourceTree = "<group>"; };
 		DFDBBA502AE7C2CC0050F1DB /* MovieCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -112,7 +112,6 @@
 			isa = PBXGroup;
 			children = (
 				DF342D592AEEABDC008DF101 /* MovieDetailView.swift */,
-				DF342D5D2AEECBB5008DF101 /* ImageViewController.swift */,
 			);
 			path = Detail;
 			sourceTree = "<group>";
@@ -173,6 +172,8 @@
 			children = (
 				DFF45DD02AE6BD7A001EA107 /* PopularMoviesViewController.swift */,
 				DF342D552AEE745B008DF101 /* MovieDetailsViewController.swift */,
+				DFB2BCA32AF03DB700C81AE5 /* VideoPlayerViewController.swift */,
+				DF342D5D2AEECBB5008DF101 /* ImageViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -231,7 +232,6 @@
 			children = (
 				DFF45DF32AE6D2D4001EA107 /* ApiManager.swift */,
 				DFF45DF52AE6D2E1001EA107 /* AlamofireHelper.swift */,
-				DF96FC302AE8155D0039B4B3 /* AlamofireImageLoader.swift */,
 				DF96FC322AE81B860039B4B3 /* APICacheManager.swift */,
 			);
 			path = Managers;
@@ -373,6 +373,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DF342D5A2AEEABDC008DF101 /* MovieDetailView.swift in Sources */,
+				DFB2BCA42AF03DB700C81AE5 /* VideoPlayerViewController.swift in Sources */,
 				DFF45E012AE6EE0E001EA107 /* LogManager.swift in Sources */,
 				DFDBBA552AE7CAB10050F1DB /* MovieCollectionViewCellViewModel.swift in Sources */,
 				DF342D582AEEAB3A008DF101 /* MovieDetailViewViewModel.swift in Sources */,
@@ -404,7 +405,6 @@
 				DF342D562AEE745B008DF101 /* MovieDetailsViewController.swift in Sources */,
 				DF13ECD22AEBBA1A00666311 /* MovieNoSearchResultsView.swift in Sources */,
 				DFF45DE22AE6C457001EA107 /* Extensions.swift in Sources */,
-				DF96FC312AE8155D0039B4B3 /* AlamofireImageLoader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -555,7 +555,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -584,7 +584,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

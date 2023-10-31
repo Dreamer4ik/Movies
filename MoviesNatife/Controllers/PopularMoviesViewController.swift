@@ -84,15 +84,42 @@ extension PopularMoviesViewController: MovieListViewDelegate {
     }
     
     func movieListView(_ movieListView: MovieListView, didSelectMovie movie: Movie) {
-        ApiManager.shared.fetchMovieById(id: movie.id) { [weak self] result in
+        let dispatchGroup = DispatchGroup()
+        var trailerURL: URL?
+        
+        dispatchGroup.enter()
+        ApiManager.shared.fetchMovieVideosById(id: movie.id) { result in
+            defer { dispatchGroup.leave() }
+            
+            switch result {
+            case .success(let videoResponse):
+                if let trailerVideo = videoResponse.results.first(where: { $0.type == TypeEnum.trailer }) {
+                    let trailerKey = trailerVideo.key
+                    trailerURL = URL(string: "https://www.youtube.com/watch?v=\(trailerKey)")
+                }
+            case .failure(let error):
+                print("Error fetching movie videos: \(error)")
+            }
+        }
+        
+        var movieDetails: MovieDetails?
+        
+        dispatchGroup.enter()
+        ApiManager.shared.fetchMovieDetailsById(id: movie.id) { result in
+            defer { dispatchGroup.leave() }
             switch result {
             case .success(let movie):
-                let vm = MovieDetailViewViewModel(movie: movie)
-                let vc = MovieDetailsViewController(viewModel: vm)
-                self?.navigationController?.pushViewController(vc, animated: true)
+                movieDetails = movie
             case .failure(let error):
                 print(error.localizedDescription)
             }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            guard let movieDetails = movieDetails else { return }
+                let vm = MovieDetailViewViewModel(movie: movieDetails, trailerURL: trailerURL)
+                let vc = MovieDetailsViewController(viewModel: vm)
+                self.navigationController?.pushViewController(vc, animated: true)
         }
     }
 }

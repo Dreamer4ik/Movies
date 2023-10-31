@@ -14,37 +14,34 @@ final class MovieCollectionViewCellViewModel: Hashable, Equatable {
     private let releaseDate: String
     public let genreIDS: [Int]
     private let rating: Double
-    private let movieImageUrl: URL?
-    
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = .current
-        return formatter
-    }()
+    private let posterPath: String?
     
     // MARK: - Init
-    
     init(
         movieTitle: String,
         releaseDate: String,
         genreIDS: [Int],
         rating: Double,
-        movieImageUrl: URL?
+        posterPath: String?
     ) {
         self.movieTitle = movieTitle
         self.releaseDate = releaseDate
         self.genreIDS = genreIDS
         self.rating = rating
-        self.movieImageUrl = movieImageUrl
+        self.posterPath = posterPath
     }
     
     public var movieTitleText: String {
         return "\(movieTitle), \(releaseDateText)"
     }
     
+    public var imageURL: URL? {
+        guard let posterPath = posterPath else { return noImageURL }
+        return  URL(string: "\(posterBaseUrl)\(posterPath)")
+    }
+    
     private var releaseDateText: String {
-        if let date = dateFormatter.date(from: releaseDate) {
+        if let date = Utilities.dateFormatter().date(from: releaseDate) {
             let yearFormatter = DateFormatter()
             yearFormatter.dateFormat = "yyyy"
             let year = yearFormatter.string(from: date)
@@ -58,16 +55,6 @@ final class MovieCollectionViewCellViewModel: Hashable, Equatable {
     public var roundedRating: String {
         let roundedRating = (rating * 10).rounded() / 10
         return String(format: "%.1f", roundedRating)
-    }
-    
-    public func fetchImage(completion: @escaping (Result<Data, Error>) -> Void) {
-        guard let url = movieImageUrl else {
-            completion(.failure(URLError(.badURL)))
-            return
-        }
-        AlamofireImageLoader.shared.loadImage(from: url) { result in
-            completion(result)
-        }
     }
     
     public func fetchGenres(completion: @escaping (Result<GenresResponse, Error>) -> Void) {
@@ -91,7 +78,6 @@ final class MovieCollectionViewCellViewModel: Hashable, Equatable {
         hasher.combine(releaseDate)
         hasher.combine(genreIDS)
         hasher.combine(rating)
-        hasher.combine(movieImageUrl)
     }
 }
 
