@@ -22,6 +22,7 @@ final class MovieListView: UIView {
     private let viewModel = MovieListViewViewModel()
     private let searchInputView = MovieSearchInputView()
     private let noResultsView = MovieNoSearchResultsView()
+    private var isScrollToTopButtonVisible = false
     
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .large)
@@ -50,6 +51,17 @@ final class MovieListView: UIView {
         return collectionView
     }()
     
+    private let upButton: UIButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(systemName: "chevron.up.circle.fill")
+        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .semibold)
+        button.setImage(image?.withConfiguration(config), for: .normal)
+        button.backgroundColor = .systemGray3.withAlphaComponent(0.7)
+        button.tintColor = .label
+        button.isHidden = true
+        return button
+    }()
+    
     // MARK: - Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -65,7 +77,7 @@ final class MovieListView: UIView {
     // MARK: - Helpers
     private func configureUI() {
         backgroundColor = .systemBackground
-        addSubviews(searchInputView, collectionView, noResultsView, spinner)
+        addSubviews(searchInputView, collectionView, noResultsView, spinner, upButton)
         spinner.center(inView: self)
         spinner.setDimensions(width: 100, height: 100)
         spinner.startAnimating()
@@ -74,6 +86,12 @@ final class MovieListView: UIView {
         searchInputView.delegate = self
         
         collectionView.anchor(top: searchInputView.bottomAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor)
+        
+        
+        let sizeButton: CGFloat = 46
+        upButton.anchor(bottom: collectionView.bottomAnchor, right: rightAnchor, paddingBottom: 20, paddingRight: 20, width: sizeButton, height: sizeButton)
+        upButton.layer.cornerRadius = sizeButton/2
+        upButton.addTarget(self, action: #selector(scrollToTopButtonTapped), for: .touchUpInside)
         
         noResultsView.center(inView: self)
         noResultsView.setDimensions(width: 200, height: 240)
@@ -105,6 +123,7 @@ final class MovieListView: UIView {
         viewModel.registerNoResultsHandler { [weak self] in
             DispatchQueue.main.async {
                 self?.noResultsView.isHidden = false
+                self?.upButton.isHidden = true
                 self?.collectionView.isHidden = true
             }
         }
@@ -120,12 +139,34 @@ final class MovieListView: UIView {
     @objc private func didTapDismiss() {
         searchInputView.searchBar.resignFirstResponder()
     }
+    
+    @objc private func scrollToTopButtonTapped() {
+        let indexPath = IndexPath(item: 0, section: 0)
+        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+    }
 }
 
 // MARK: - MovieListViewViewModelDelegate
 extension MovieListView: MovieListViewViewModelDelegate {
+    func shouldShowScrollToTopButton(_ show: Bool) {
+        if show {
+            UIView.animate(withDuration: 0.3) {
+                self.upButton.isHidden = false
+            }
+        } else {
+            
+            UIView.animate(withDuration: 0.3) {
+                self.upButton.isHidden = true
+            }
+        }
+    }
+    
     func didChangeSortingOption(_ sortingOption: SortingOptions) {
         viewModel.updateSortingOption(sortingOption)
+        
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
     }
     
     func didReloadMovies() {
@@ -146,7 +187,7 @@ extension MovieListView: MovieListViewViewModelDelegate {
         spinner.stopAnimating()
         collectionView.reloadData()
         collectionView.isHidden = false
-       
+        
         
         let animator = UIViewPropertyAnimator(duration: 0.4, curve: .linear) {
             self.collectionView.alpha = 1

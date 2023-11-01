@@ -26,8 +26,9 @@ final class MovieDetailViewViewModel {
         return trailerURL == nil
     }
     
-    public var imageImgeUrl: URL? {
-        return URL(string: "\(posterBaseUrl)\(movie.posterPath)")
+    public var imageURL: URL? {
+        guard let posterPath = movie.posterPath else { return BaseConstants.API.noImageURL }
+        return  URL(string: "\(BaseConstants.API.posterBaseUrl)\(posterPath)")
     }
     
     public var countryAndYear: String {
@@ -56,6 +57,6 @@ final class MovieDetailViewViewModel {
     }
     
     public var genres: String {
-        return movie.genres.map { $0.name }.joined(separator: ", ")
+        return movie.genres.map { $0.name.localized() }.joined(separator: ", ")
     }
 }

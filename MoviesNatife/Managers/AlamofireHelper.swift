@@ -10,7 +10,7 @@ import Alamofire
 
 let httpHeaders: HTTPHeaders =  [
     "accept": "application/json",
-    "Authorization": "Bearer \(API_KEY)"
+    "Authorization": "Bearer \(BaseConstants.API.API_KEY)"
 ]
 
 
@@ -47,7 +47,7 @@ final class AlamofireHelper {
               return
           }
           
-          guard var urlRequest = request.urlAF else {
+          guard var urlRequest = request.url else {
               completion(.failure(AFError.failedToCreateRequest))
               return
           }

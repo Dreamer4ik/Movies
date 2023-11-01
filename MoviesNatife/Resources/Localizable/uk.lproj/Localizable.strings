@@ -1,0 +1,43 @@
+/* 
+  Localizable.strings
+  MoviesNatife
+
+  Created by Ivan Potapenko on 31.10.2023.
+  
+*/
+
+
+// MARK: - Base text
+"popularMovies" = "Популярні фільми";
+"searchByTitle" = "Пошук за назвою...";
+"rating" = "Рейтинг";
+
+// MARK: - Genres
+"Action" = "Бойовики";
+"Adventure" = "Пригоди";
+"Animation" = "Мультфільми";
+"Comedy" = "Комедії";
+"Crime" = "Кримінал";
+"Documentary" = "Документальні";
+"Drama" = "Драми";
+"Family" = "Сімейні";
+"Fantasy" = "Фентезі";
+"History" = "Історичні";
+"Horror" = "Ужаси";
+"Music" = "Мюзикли";
+"Mystery" = "Містика";
+"Romance" = "Роман";
+"Science Fiction" = "Наукова Фантастика";
+"TV Movie" = "Серіали";
+"Thriller" = "Триллери";
+"War" = "Війни";
+"Western" = "Вестерни";
+"noGenre" = "No Genre";
+
+// MARK: - SortingOptions text
+"sortByPopularity" = "Сортувати за популярністю";
+"sortByRating" = "Сортувати за рейтингом";
+"sortByNew" = "Cортувати за найновішими";
+"sortByOld" = "Сортувати за cтарими";
+"cancel" = "Скасувати";
+"dismiss" = "Сховати";

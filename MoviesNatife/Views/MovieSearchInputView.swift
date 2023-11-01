@@ -20,6 +20,7 @@ final class MovieSearchInputView: UIView {
     
     public let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
+        searchBar.placeholder = BaseConstants.Localization.searchMoviesPlaceholder
         return searchBar
     }()
     
@@ -49,7 +50,10 @@ final class MovieSearchInputView: UIView {
         let toolbar = UIToolbar()
         toolbar.barStyle = .default
         toolbar.isTranslucent = true
-        let doneButton = UIBarButtonItem(title: "Dismiss", style: .done, target: self, action: #selector(doneButtonTapped))
+        let doneButton = UIBarButtonItem(title: BaseConstants.Localization.dismissText, 
+                                         style: .done,
+                                         target: self,
+                                         action: #selector(doneButtonTapped))
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         toolbar.setItems([flexibleSpace, doneButton], animated: false)
         toolbar.isUserInteractionEnabled = true

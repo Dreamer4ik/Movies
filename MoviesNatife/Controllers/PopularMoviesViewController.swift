@@ -8,16 +8,41 @@
 import UIKit
 
 enum SortingOptions: CaseIterable {
-    case first
-    case second
-    case third
-    case forth
+    case popularity
+    case rating
+    case newier
+    case older
+    
+    func comparator() -> (Movie, Movie) -> Bool {
+        switch self {
+        case .popularity:
+            return { $0.popularity > $1.popularity }
+        case .rating:
+            return { $0.voteAverage > $1.voteAverage }
+        case .newier:
+            return { (m1, m2) in
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                let date1 = dateFormatter.date(from: m1.releaseDate)
+                let date2 = dateFormatter.date(from: m2.releaseDate)
+                return date1 ?? Date.distantPast > date2 ?? Date.distantPast
+            }
+        case .older:
+            return { (m1, m2) in
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                let date1 = dateFormatter.date(from: m1.releaseDate)
+                let date2 = dateFormatter.date(from: m2.releaseDate)
+                return date1 ?? Date.distantPast < date2 ?? Date.distantPast
+            }
+        }
+    }
 }
 
 class PopularMoviesViewController: UIViewController {
     // MARK: - Properties
     private let movieListView = MovieListView()
-    private var selectedSortingOption: SortingOptions = .first
+    private var selectedSortingOption: SortingOptions = .popularity
     
     
     // MARK: - Lifecycle
@@ -37,7 +62,7 @@ class PopularMoviesViewController: UIViewController {
     }
     
     private func setUpNavBar() {
-        title = "Popular Movies"
+        title = BaseConstants.Localization.popularMoviesTitle
         Utilities.configureNavBar(vc: self)
         
         navigationController?.navigationBar.tintColor = .label
@@ -54,10 +79,10 @@ class PopularMoviesViewController: UIViewController {
     
     func openSortingOptions() {
         let action = UIAlertController.actionSheetWithItems(items: [
-            ("Sort by 1", SortingOptions.first),
-            ("Sort by 2", SortingOptions.second),
-            ("Sort by 3", SortingOptions.third),
-            ("Sort by 4", SortingOptions.forth)
+            (BaseConstants.Localization.sortByPopularity, SortingOptions.popularity),
+            (BaseConstants.Localization.sortByRating, SortingOptions.rating),
+            (BaseConstants.Localization.sortByNew, SortingOptions.newier),
+            (BaseConstants.Localization.sortByOld, SortingOptions.older)
             
         ], currentSelection: selectedSortingOption, action: { (value) in
             if let sortingOption = value as? SortingOptions {
@@ -66,7 +91,7 @@ class PopularMoviesViewController: UIViewController {
             }
         })
         
-        action.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        action.addAction(UIAlertAction(title: BaseConstants.Localization.cancel, style: .cancel, handler: nil))
         self.present(action, animated: true, completion: nil)
     }
     // MARK: - Actions

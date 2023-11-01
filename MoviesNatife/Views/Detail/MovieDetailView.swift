@@ -53,7 +53,7 @@ final class MovieDetailView: UIView {
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16)
+        label.font = .systemFont(ofSize: 16, weight: .regular)
         label.numberOfLines = 0
         return label
     }()
@@ -133,12 +133,12 @@ final class MovieDetailView: UIView {
         titleLabel.text = viewModel.title
         yearAndCountryLabel.text = viewModel.countryAndYear
         genresLabel.text = viewModel.genres
-        ratingLabel.text = "Rating: \(viewModel.roundedRating)"
+        ratingLabel.text = "\(BaseConstants.Localization.rating): \(viewModel.roundedRating)"
         descriptionLabel.text = viewModel.descriptionText
         
         trailerButton.isHidden = viewModel.trailerButtonIsHidden
         
-        posterImageView.sd_setImage(with: viewModel.imageImgeUrl, completed: nil)
+        posterImageView.sd_setImage(with: viewModel.imageURL, completed: nil)
     }
     // MARK: - Actions
     @objc private func didTapTrailerButton() {

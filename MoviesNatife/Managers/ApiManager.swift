@@ -22,19 +22,15 @@ typealias ApiManagerCallback<T> = (ApiManagerNetworkResult<T>) -> Void
 
 class ApiManager: NSObject {
     static let shared = ApiManager() // fixMe
-    let params: Parameters = ["api_key": API_KEY]
+    let params: Parameters = ["api_key": BaseConstants.API.API_KEY]
     
-//    let viewController: UIViewController
-//    
-//    init(viewController: UIViewController) {
-//        self.viewController = viewController
-//        super.init()
-//    }
-    
-    func getPopularMovies(page: Int? = nil, completionHandler: @escaping ApiManagerCallback<MoviesResponse>) {
+    func getPopularMovies(page: Int? = nil, sortingOption: String? = nil, completionHandler: @escaping ApiManagerCallback<MoviesResponse>) {
         var updatedParams = params
         if let page = page {
             updatedParams["page"] = "\(page)"
+        }
+        if let sortingOption = sortingOption {
+            updatedParams["sort_by"] = sortingOption
         }
         
         AlamofireHelper.sendRequest(expecting: MoviesResponse.self, request: .listPopularMoviesRequest, method: .get, params: updatedParams) { (result: AlamofireHelperNetworkResult<MoviesResponse>) in
@@ -96,5 +92,4 @@ class ApiManager: NSObject {
             }
         }
     }
-    
 }

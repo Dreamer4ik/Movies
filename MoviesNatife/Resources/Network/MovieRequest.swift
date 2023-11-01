@@ -19,7 +19,7 @@ final class MovieRequest {
     
     /// Constructed url for the api request in string format
     private var urlString: String {
-        var string = baseUrl
+        var string = BaseConstants.API.baseUrl
         string += endpoint.rawValue
         
         if !pathComponents.isEmpty {
@@ -45,15 +45,7 @@ final class MovieRequest {
     
     /// Computed & constructed API url
     public var url: URL? {
-        return URL(string: urlString + "?api_key=\(API_KEY)") // remove key
-    }
-    
-    public var urlAF: URL? { // AF url return to this and remove AF
         return URL(string: urlString)
-    }
-    
-    public var urlAndToken: URL? {
-        return URL(string: urlString + "?api_key=\(API_KEY)")
     }
     
     /// Desired httpMethod
@@ -80,11 +72,11 @@ final class MovieRequest {
     convenience init?(url: URL) {
         let string = url.absoluteString
         
-        if !string.contains(baseUrl) {
+        if !string.contains(BaseConstants.API.baseUrl) {
             return nil
         }
         
-        let trimmed = string.replacingOccurrences(of: baseUrl, with: "")
+        let trimmed = string.replacingOccurrences(of: BaseConstants.API.baseUrl, with: "")
         if trimmed.contains("/") {
             let components = trimmed.components(separatedBy: "/")
             if !components.isEmpty {

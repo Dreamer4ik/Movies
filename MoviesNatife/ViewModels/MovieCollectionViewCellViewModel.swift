@@ -36,8 +36,8 @@ final class MovieCollectionViewCellViewModel: Hashable, Equatable {
     }
     
     public var imageURL: URL? {
-        guard let posterPath = posterPath else { return noImageURL }
-        return  URL(string: "\(posterBaseUrl)\(posterPath)")
+        guard let posterPath = posterPath else { return BaseConstants.API.noImageURL }
+        return  URL(string: "\(BaseConstants.API.posterBaseUrl)\(posterPath)")
     }
     
     private var releaseDateText: String {

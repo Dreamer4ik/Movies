@@ -18,6 +18,7 @@ protocol MovieListViewViewModelDelegate: AnyObject {
     func didLoadMoreMovies()
     func didSelectMovie(_ movie: Movie)
     func didChangeSortingOption(_ sortingOption: SortingOptions)
+    func shouldShowScrollToTopButton(_ show: Bool)
 }
 
 /// View model to handle movie list view logic
@@ -28,6 +29,7 @@ final class MovieListViewViewModel: NSObject {
     private var searchText = ""
     private var currentRequest: MovieRequest?
     private var isLoadingMovies = false
+    private var selectedSortingOption: SortingOptions = .popularity
     
     private var searchResultHandler: (() -> Void)?
     private var noResultsHandler: (() -> Void)?
@@ -50,6 +52,8 @@ final class MovieListViewViewModel: NSObject {
         }
     }
     
+    private let dateFormatter = Utilities.dateFormatter()
+    
     private var cellViewModels: [MovieCollectionViewCellViewModel] = []
     private var resultPages: (currentPage: Int, totalPages: Int) = (0, 0)
     
@@ -66,14 +70,17 @@ final class MovieListViewViewModel: NSObject {
         // Cache doesn't work
         switch viewMode {
         case .regular:
-            ApiManager.shared.getPopularMovies { [weak self] result in
+            let sortingOption = "popularity.desc"
+            ApiManager.shared.getPopularMovies(sortingOption: sortingOption) { [weak self] result in
                 guard let strongSelf = self else {
                     return
                 }
                 switch result {
                 case .success(let models):
                     strongSelf.resultPages = (models.page, models.totalPages)
-                    strongSelf.movies = models.results
+                    var results = models.results
+                    results.sort(by: SortingOptions.popularity.comparator())
+                    strongSelf.movies = results
                     
                     DispatchQueue.main.async {
                         if let reload = reload {
@@ -103,15 +110,30 @@ final class MovieListViewViewModel: NSObject {
         print("Fetching more movies")
         resultPages.currentPage += 1
         
+        var sortingOption: String?
+        
+        switch selectedSortingOption {
+        case .popularity:
+            sortingOption = "popularity.desc"
+        case .rating:
+            sortingOption = "vote_average.desc"
+        case .newier:
+            sortingOption = "release_date.desc"
+        case .older:
+            sortingOption = "release_date.asc"
+        }
+        
         switch viewMode {
         case .regular:
-            ApiManager.shared.getPopularMovies(page: resultPages.currentPage) { [weak self] result in
+            ApiManager.shared.getPopularMovies(page: resultPages.currentPage, sortingOption: sortingOption) { [weak self] result in
                 guard let strongSelf = self else {
                     return
                 }
                 switch result {
                 case .success(let moviesResponse):
-                    let moreMovies = moviesResponse.results
+                    var moreMovies = moviesResponse.results
+                    moreMovies.sort(by: strongSelf.selectedSortingOption.comparator())
+                    
                     strongSelf.movies.append(contentsOf: moreMovies)
                     DispatchQueue.main.async {
                         strongSelf.delegate?.didLoadMoreMovies()
@@ -130,7 +152,9 @@ final class MovieListViewViewModel: NSObject {
                 }
                 switch result {
                 case .success(let moviesResponse):
-                    let moreMovies = moviesResponse.results
+                    var moreMovies = moviesResponse.results
+                    moreMovies.sort(by: strongSelf.selectedSortingOption.comparator())
+                    
                     strongSelf.movies.append(contentsOf: moreMovies)
                     DispatchQueue.main.async {
                         strongSelf.delegate?.didLoadMoreMovies()
@@ -194,8 +218,11 @@ final class MovieListViewViewModel: NSObject {
     private func processSearchResults(model: Codable) {
         if let movieResults = model as? MoviesResponse, !movieResults.results.isEmpty {
             reloadMovies()
-            movies = movieResults.results
             resultPages = (movieResults.page, movieResults.totalPages)
+            var results = movieResults.results
+            results.sort(by: SortingOptions.popularity.comparator())
+            movies = results
+            
             self.handleResults()
         } else {
             self.handleNoResults()
@@ -225,18 +252,18 @@ final class MovieListViewViewModel: NSObject {
     }
     
     func updateSortingOption(_ sortingOption: SortingOptions) {
-        // TODO: - Сделать сортировки
-//        self.selectedSortingOption = sortingOption
-        switch sortingOption {
-        case .first:
-            print("1")
-        case .second:
-            print("2")
-        case .third:
-            print("3")
-        case .forth:
-            print("4")
-        }
+        guard selectedSortingOption != sortingOption else { return }
+        
+        cellViewModels.removeAll()
+        selectedSortingOption = sortingOption
+        
+        sortMovies(using: sortingOption.comparator())
+    }
+    
+    
+    private func sortMovies(using comparator: (Movie, Movie) -> Bool) {
+        movies.sort(by: comparator)
+        delegate?.didChangeSortingOption(selectedSortingOption)
     }
     
     // MARK: - Helpers
@@ -304,6 +331,15 @@ extension MovieListViewViewModel: UICollectionViewDelegateFlowLayout {
 // MARK: - UIScrollViewDelegate
 extension MovieListViewViewModel: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let contentYoffset = scrollView.contentOffset.y
+        let scrollHeight = scrollView.frame.height
+        
+        if contentYoffset >= abs(scrollHeight * 3) {
+            delegate?.shouldShowScrollToTopButton(true)
+        } else {
+            delegate?.shouldShowScrollToTopButton(false)
+        }
+        
         guard shouldShowLoadMoreIndicator,
               !isLoadingMovies,
               !cellViewModels.isEmpty else {
@@ -311,7 +347,6 @@ extension MovieListViewViewModel: UIScrollViewDelegate {
         }
         
         let height = scrollView.frame.size.height
-        let contentYoffset = scrollView.contentOffset.y
         let distanceFromBottom = scrollView.contentSize.height - contentYoffset
         
         if distanceFromBottom < height {

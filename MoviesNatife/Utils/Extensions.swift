@@ -7,6 +7,7 @@
 
 import UIKit
 
+//MARK: - UIView
 extension UIView {
     func anchor(top: NSLayoutYAxisAnchor? = nil,
                 left: NSLayoutXAxisAnchor? = nil,
@@ -119,6 +120,7 @@ extension UIView {
     }
 }
 
+//MARK: - UIViewController
 extension UIViewController {
     var navigationBarBottom: CGFloat {
         if let height = self.navigationController?.navigationBar.frame.height,
@@ -129,6 +131,7 @@ extension UIViewController {
     }
 }
 
+//MARK: - UIScrollView
 extension UIScrollView {
     func fitSizeOfContent() {
         var contentRect = CGRect.zero
@@ -141,6 +144,7 @@ extension UIScrollView {
     }
 }
 
+//MARK: - UIAlertController
 extension UIAlertController {
     static func actionSheetWithItems<A : Equatable>(items : [(title : String, value : A)], currentSelection : A? = nil, action : @escaping (A) -> Void) -> UIAlertController {
         let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -155,5 +159,18 @@ extension UIAlertController {
             )
         }
         return controller
+    }
+}
+
+//MARK: - String
+extension String {
+    func localized() -> String {
+        NSLocalizedString(
+            self,
+            tableName: "Localizable",
+            bundle: .main,
+            value: self,
+            comment: self
+        )
     }
 }

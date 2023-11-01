@@ -1,0 +1,23 @@
+/* 
+  Localizable.strings
+  MoviesNatife
+
+  Created by Ivan Potapenko on 31.10.2023.
+  
+*/
+
+// MARK: - Base text
+"popularMovies" = "Popular Movies";
+"searchByTitle" = "Search by title...";
+"rating" = "Rating";
+
+// MARK: - SortingOptions text
+"sortByPopularity" = "Sort by Popularity";
+"sortByRating" = "Sort by Rating";
+"sortByNew" = "Sort by Newier";
+"sortByOld" = "Sort by Older";
+"cancel" = "Cancel";
+"dismiss" = "Dismiss";
+
+
+"noGenre" = "No Genre";

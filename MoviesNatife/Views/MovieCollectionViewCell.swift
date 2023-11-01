@@ -140,13 +140,13 @@ final class MovieCollectionViewCell: UICollectionViewCell {
                 let matchingGenres = model.genres.filter { genre in
                     return viewModel.genreIDS.contains(genre.id)
                 }
-                let matchingGenreNames = matchingGenres.map { $0.name }
+                let matchingGenreNames = matchingGenres.map { $0.name.localized() }
                 let genreNames: String
                 if !matchingGenreNames.isEmpty {
                     genreNames = matchingGenreNames.joined(separator: ", ")
                     
                 } else {
-                    genreNames = "No Genre"
+                    genreNames = BaseConstants.Localization.noGenre
                 }
                 
                 DispatchQueue.main.async {

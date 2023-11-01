@@ -9,18 +9,18 @@ import Foundation
 
 struct MovieDetails: Codable {
     let adult: Bool
-    let backdropPath: String
+    let backdropPath: String?
 //    let belongsToCollection: BelongsToCollection
     let budget: Int
     let genres: [Genre]
     let homepage: String
     let id: Int
-    let imdbID: String
+    let imdbID: String?
     let originalLanguage: String
     let originalTitle: String
     let overview: String
     let popularity: Double
-    let posterPath: String
+    let posterPath: String?
     let productionCompanies: [ProductionCompany]
     let productionCountries: [ProductionCountry]
     let releaseDate: String
