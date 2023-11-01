@@ -37,6 +37,7 @@ class ApiManager: NSObject {
             switch result {
             case .success(let movies):
                 completionHandler(.success(movies))
+                
             case .failure(let error):
                 completionHandler(.failure(error))
             }

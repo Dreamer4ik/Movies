@@ -134,27 +134,38 @@ final class MovieCollectionViewCell: UICollectionViewCell {
         ratingLabel.text = "\(viewModel.roundedRating)"
         imageView.sd_setImage(with: viewModel.imageURL, completed: nil)
         
-        viewModel.fetchGenres { [weak self] result in
-            switch result {
-            case .success(let model):
-                let matchingGenres = model.genres.filter { genre in
-                    return viewModel.genreIDS.contains(genre.id)
-                }
-                let matchingGenreNames = matchingGenres.map { $0.name.localized() }
-                let genreNames: String
-                if !matchingGenreNames.isEmpty {
-                    genreNames = matchingGenreNames.joined(separator: ", ")
+        if Network.reachability?.isReachable == false {
+            let apiGenreIDs = viewModel.genreIDS
+            let genresList = OfflineGenres.genresList
+            let apiGenreNames = genresList.filter { genre in
+                return apiGenreIDs.contains(genre.id)
+            }.map { $0.name.localized() }
+            
+            genresLabel.text = apiGenreNames.joined(separator: ", ")
+        } else {
+            viewModel.fetchGenres { [weak self] result in
+                switch result {
+                case .success(let model):
+                    let matchingGenres = model.genres.filter { genre in
+                        return viewModel.genreIDS.contains(genre.id)
+                    }
+                    let matchingGenreNames = matchingGenres.map { $0.name.localized() }
+                    let genreNames: String
+                    if !matchingGenreNames.isEmpty {
+                        genreNames = matchingGenreNames.joined(separator: ", ")
+                        
+                    } else {
+                        genreNames = BaseConstants.Localization.noGenre
+                    }
                     
-                } else {
-                    genreNames = BaseConstants.Localization.noGenre
+                    DispatchQueue.main.async {
+                        self?.genresLabel.text = "\(genreNames)"
+                    }
+                case .failure(let error):
+                    print(error.localizedDescription)
                 }
-                
-                DispatchQueue.main.async {
-                    self?.genresLabel.text = "\(genreNames)"
-                }
-            case .failure(let error):
-                print(error.localizedDescription)
             }
         }
+        
     }
 }

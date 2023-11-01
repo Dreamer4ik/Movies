@@ -19,6 +19,7 @@ protocol MovieListViewViewModelDelegate: AnyObject {
     func didSelectMovie(_ movie: Movie)
     func didChangeSortingOption(_ sortingOption: SortingOptions)
     func shouldShowScrollToTopButton(_ show: Bool)
+    func upToCollection()
 }
 
 /// View model to handle movie list view logic
@@ -52,6 +53,7 @@ final class MovieListViewViewModel: NSObject {
         }
     }
     
+    private var filteredMovies: [Movie] = []
     private let dateFormatter = Utilities.dateFormatter()
     
     private var cellViewModels: [MovieCollectionViewCellViewModel] = []
@@ -67,7 +69,6 @@ final class MovieListViewViewModel: NSObject {
         
         isLoadingMovies = true
         
-        // Cache doesn't work
         switch viewMode {
         case .regular:
             let sortingOption = "popularity.desc"
@@ -182,6 +183,13 @@ final class MovieListViewViewModel: NSObject {
         }
     }
     
+    public func showCachMovies() {
+        updateCellViewModels(with: movies)
+        DispatchQueue.main.async {
+            self.delegate?.didReloadMovies()
+        }
+    }
+    
     
     // MARK: - Search
     private func makeSearchAPICall<T: Codable>(_ type: T.Type, request: MovieRequest) {
@@ -196,6 +204,48 @@ final class MovieListViewViewModel: NSObject {
     }
     
     public func executeSearch() {
+        if Network.reachability?.isReachable == false {
+            performLocalSearch()
+        } else {
+            performAPISearch()
+        }
+        
+        
+    }
+    
+    private func performLocalSearch() {
+        guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return
+        }
+        
+        cellViewModels.removeAll()
+        
+        filteredMovies = movies.filter { movie in
+            return movie.title.localizedCaseInsensitiveContains(searchText)
+        }
+        
+        cellViewModels = filteredMovies.map { movie in
+            return MovieCollectionViewCellViewModel(
+                movieTitle: movie.title,
+                releaseDate: movie.releaseDate,
+                genreIDS: movie.genreIDS,
+                rating: movie.voteAverage,
+                posterPath: movie.posterPath
+            )
+        }
+        
+        if !filteredMovies.isEmpty {
+            handleResults()
+            DispatchQueue.main.async {
+                self.delegate?.didReloadMovies()
+                self.delegate?.upToCollection()
+            }
+        } else {
+            handleNoResults()
+        }
+    }
+    
+    private func performAPISearch() {
         guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else {
             return
         }
@@ -224,6 +274,9 @@ final class MovieListViewViewModel: NSObject {
             movies = results
             
             self.handleResults()
+            DispatchQueue.main.async {
+                self.delegate?.upToCollection()
+            }
         } else {
             self.handleNoResults()
         }
@@ -262,13 +315,38 @@ final class MovieListViewViewModel: NSObject {
     
     
     private func sortMovies(using comparator: (Movie, Movie) -> Bool) {
-        movies.sort(by: comparator)
+        if Network.reachability?.isReachable == false {
+            filteredMovies.sort(by: comparator)
+            updateCellViewModels(with: filteredMovies)
+        } else {
+            movies.sort(by: comparator)
+        }
+        
         delegate?.didChangeSortingOption(selectedSortingOption)
     }
     
     // MARK: - Helpers
     public var shouldShowLoadMoreIndicator: Bool {
+        guard Network.reachability?.isReachable == true else { return false}
         return resultPages.0 < resultPages.1 && resultPages.0 > 0
+    }
+    
+    private func updateCellViewModels(with movies: [Movie]) {
+        cellViewModels.removeAll()
+        
+        for movie in movies {
+            let viewModel = MovieCollectionViewCellViewModel(
+                movieTitle: movie.title,
+                releaseDate: movie.releaseDate,
+                genreIDS: movie.genreIDS,
+                rating: movie.voteAverage,
+                posterPath: movie.posterPath
+            )
+            
+            if !cellViewModels.contains(where: { $0.movieTitle == viewModel.movieTitle }) {
+                cellViewModels.append(viewModel)
+            }
+        }
     }
 }
 
@@ -310,9 +388,14 @@ extension MovieListViewViewModel: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        if Network.reachability?.isReachable == false && viewMode == .search {
+            return .zero
+        }
+        
         guard shouldShowLoadMoreIndicator else {
             return .zero
         }
+        
         return CGSize(width: collectionView.width, height: 100)
     }
 }

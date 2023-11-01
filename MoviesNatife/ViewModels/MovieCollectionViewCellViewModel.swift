@@ -10,7 +10,7 @@ import UIKit
 
 final class MovieCollectionViewCellViewModel: Hashable, Equatable {
     // MARK: - Properties
-    private let movieTitle: String
+    public let movieTitle: String
     private let releaseDate: String
     public let genreIDS: [Int]
     private let rating: Double

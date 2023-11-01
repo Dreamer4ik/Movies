@@ -133,7 +133,11 @@ final class MovieListView: UIView {
     @objc private func handleRefresh() {
         refreshControl.beginRefreshing()
         viewModel.viewMode = .regular
-        viewModel.reloadMovies()
+        if Network.reachability?.isReachable == false {
+            viewModel.showCachMovies()
+        } else {
+            viewModel.reloadMovies()
+        }
     }
     
     @objc private func didTapDismiss() {
@@ -148,6 +152,10 @@ final class MovieListView: UIView {
 
 // MARK: - MovieListViewViewModelDelegate
 extension MovieListView: MovieListViewViewModelDelegate {
+    func upToCollection() {
+        scrollToTopButtonTapped()
+    }
+    
     func shouldShowScrollToTopButton(_ show: Bool) {
         if show {
             UIView.animate(withDuration: 0.3) {
@@ -212,7 +220,11 @@ extension MovieListView: MovieSearchInputViewDelegate {
 extension MovieListView: MovieNoSearchResultsViewDelegate {
     func didTapReturnButton() {
         viewModel.viewMode = .regular
-        viewModel.reloadMovies()
+        if Network.reachability?.isReachable == false {
+            viewModel.showCachMovies()
+        } else {
+            viewModel.reloadMovies()
+        }
         collectionView.isHidden = false
         noResultsView.isHidden = true
         let animator = UIViewPropertyAnimator(duration: 0.4, curve: .linear) {

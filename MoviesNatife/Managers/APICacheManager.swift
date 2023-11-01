@@ -6,49 +6,55 @@
 //
 
 import Foundation
-import Alamofire
+import Cache
 
 /// Manages in memory session scoped API caches
-final class APICacheManager { // проблема не тут
+final class APICacheManager {
     static let shared = APICacheManager()
     
-//    private var cacheDictionary: [
-//        MovieEndpoint: NSCache<NSString, NSData>
-//    ] = [:]
-//    
-//    init() {
-//        setUpCache()
-//    }
-//    
-//    // MARK: Public
-//    public func cachedResponse(for endpoint: MovieEndpoint, url: URL?) -> Data? {
-//        guard let targetCache = cacheDictionary[endpoint], let url = url else {
-//            return nil
-//        }
-//
-//        let key = url.absoluteString as NSString
-//        let cachedData = targetCache.object(forKey: key) as? Data
-//        if cachedData != nil {
-//            print("Cache hit for \(endpoint)")
-//        }
-//        return cachedData
-//    }
-//    public func setCache(for endpoint: MovieEndpoint, url: URL?, data: Data) {
-//        guard let targetCache = cacheDictionary[endpoint], let url = url else {
-//            return
-//        }
-//        
-//        let key = url.absoluteString as NSString
-//        targetCache.setObject(data as NSData, forKey: key)
-//    }
-//    
-//    // MARK: Private
-//    private func setUpCache() {
-////        cacheDictionary[MovieEndpoint.popularMovies]?.removeAllObjects()
-////        print("clear")
-//        MovieEndpoint.allCases.compactMap({ endpoint in
-//            cacheDictionary[endpoint] = NSCache<NSString, NSData>()
-//            print("Cache initialized for \(endpoint)")
-//        })
-//    }
+    private let diskConfig = DiskConfig(
+        name: "MoviesResponse",
+        expiry: .never
+    )
+    private let memoryConfig = MemoryConfig(
+        expiry: .never,
+        countLimit: 20,
+        totalCostLimit: 10
+    )
+    
+    private var storage: Storage<String, MoviesResponse>?
+    
+    init() {
+        do {
+            storage = try Storage(
+                diskConfig: diskConfig,
+                memoryConfig: memoryConfig,
+                transformer: TransformerFactory.forCodable(ofType: MoviesResponse.self)
+            )
+        } catch {
+            print("Failed to initialize storage: \(error)")
+        }
+    }
+    
+    func getCachedResponse<T: Codable>(for key: String, completion: @escaping AlamofireResultCallback<T>) {
+        guard let storage = storage else {
+            completion(.failure(AFError.failedToCache))
+            return
+        }
+        
+        if let cachedData = try? storage.object(forKey: key) as? T {
+            completion(.success(cachedData))
+        } else {
+            completion(.failure(AFError.failedToCache))
+        }
+    }
+    
+    // MARK: Private
+    func cacheResponse(_ data: MoviesResponse, for key: String) {
+        do {
+            try storage?.setObject(data, forKey: key)
+        } catch {
+            print("Failed to cache response: \(error)")
+        }
+    }
 }
