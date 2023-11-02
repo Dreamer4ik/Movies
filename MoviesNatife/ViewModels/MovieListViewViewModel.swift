@@ -85,7 +85,7 @@ final class MovieListViewViewModel: NSObject {
                 case .success(let models):
                     strongSelf.resultPages = (models.page, models.totalPages)
                     var results = models.results
-                    results.sort(by: SortingOptions.popularity.comparator())
+                    results.sort(by: strongSelf.selectedSortingOption.comparator())
                     strongSelf.movies = results
                     
                     DispatchQueue.main.async {
@@ -233,6 +233,8 @@ final class MovieListViewViewModel: NSObject {
             return movie.title.localizedCaseInsensitiveContains(searchText)
         }
         
+        filteredMovies.sort(by: selectedSortingOption.comparator())
+        
         cellViewModels = filteredMovies.map { movie in
             return MovieCollectionViewCellViewModel(
                 movieTitle: movie.title,
@@ -279,7 +281,7 @@ final class MovieListViewViewModel: NSObject {
             reloadMovies()
             resultPages = (movieResults.page, movieResults.totalPages)
             var results = movieResults.results
-            results.sort(by: SortingOptions.popularity.comparator())
+            results.sort(by: selectedSortingOption.comparator())
             movies = results
             
             self.handleResults()
@@ -325,8 +327,15 @@ final class MovieListViewViewModel: NSObject {
     
     private func sortMovies(using comparator: (Movie, Movie) -> Bool) {
         if Network.reachability?.isReachable == false {
-            filteredMovies.sort(by: comparator)
-            updateCellViewModels(with: filteredMovies)
+            switch viewMode {
+            case .regular:
+                movies.sort(by: comparator)
+                showCachMovies()
+                
+            case .search:
+                filteredMovies.sort(by: comparator)
+                updateCellViewModels(with: filteredMovies)
+            }
         } else {
             movies.sort(by: comparator)
         }
@@ -342,8 +351,9 @@ final class MovieListViewViewModel: NSObject {
     
     private func updateCellViewModels(with movies: [Movie]) {
         cellViewModels.removeAll()
-        
-        for movie in movies {
+        var results = movies
+        results.sort(by: selectedSortingOption.comparator())
+        for movie in results {
             let viewModel = MovieCollectionViewCellViewModel(
                 movieTitle: movie.title,
                 releaseDate: movie.releaseDate,
