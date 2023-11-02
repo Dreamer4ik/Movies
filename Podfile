@@ -7,5 +7,8 @@ target 'MoviesNatife' do
 
   # Pods for MoviesNatife
   pod 'Alamofire'
+  pod "youtube-ios-player-helper"
+  pod 'SDWebImage'
+  pod 'Cache'	
 
 end

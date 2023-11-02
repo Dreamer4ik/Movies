@@ -7,6 +7,7 @@
 
 import UIKit
 
+//MARK: - UIView
 extension UIView {
     func anchor(top: NSLayoutYAxisAnchor? = nil,
                 left: NSLayoutXAxisAnchor? = nil,
@@ -116,5 +117,60 @@ extension UIView {
     
     public var right: CGFloat {
         return frame.size.width + frame.origin.x
+    }
+}
+
+//MARK: - UIViewController
+extension UIViewController {
+    var navigationBarBottom: CGFloat {
+        if let height = self.navigationController?.navigationBar.frame.height,
+           let originY = self.navigationController?.navigationBar.frame.origin.y {
+            return height + originY
+        }
+        return 0.0
+    }
+}
+
+//MARK: - UIScrollView
+extension UIScrollView {
+    func fitSizeOfContent() {
+        var contentRect = CGRect.zero
+        
+        for view in subviews {
+            contentRect = contentRect.union(view.frame)
+        }
+        
+        contentSize = CGSize(width: frame.size.width, height: contentRect.size.height + contentInset.top + contentInset.bottom)
+    }
+}
+
+//MARK: - UIAlertController
+extension UIAlertController {
+    static func actionSheetWithItems<A : Equatable>(items : [(title : String, value : A)], currentSelection : A? = nil, action : @escaping (A) -> Void) -> UIAlertController {
+        let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        for (var title, value) in items {
+            if let selection = currentSelection, value == selection {
+                title = "✓ " + title
+            }
+            controller.addAction(
+                UIAlertAction(title: title, style: .default) {_ in
+                    action(value)
+                }
+            )
+        }
+        return controller
+    }
+}
+
+//MARK: - String
+extension String {
+    func localized() -> String {
+        NSLocalizedString(
+            self,
+            tableName: "Localizable",
+            bundle: .main,
+            value: self,
+            comment: self
+        )
     }
 }
