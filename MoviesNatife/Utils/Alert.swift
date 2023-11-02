@@ -11,7 +11,7 @@ class Alert {
     class func showNotice(viewController: UIViewController, title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "Ok", style: .default) { action in
+        alert.addAction(UIAlertAction(title: BaseConstants.Localization.ok, style: .default) { action in
             
         })
         alert.view.layer.cornerRadius = 20

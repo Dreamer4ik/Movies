@@ -7,43 +7,15 @@
 
 import UIKit
 
-enum SortingOptions: CaseIterable {
-    case popularity
-    case rating
-    case newier
-    case older
-    
-    func comparator() -> (Movie, Movie) -> Bool {
-        switch self {
-        case .popularity:
-            return { $0.popularity > $1.popularity }
-        case .rating:
-            return { $0.voteAverage > $1.voteAverage }
-        case .newier:
-            return { (m1, m2) in
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd"
-                let date1 = dateFormatter.date(from: m1.releaseDate)
-                let date2 = dateFormatter.date(from: m2.releaseDate)
-                return date1 ?? Date.distantPast > date2 ?? Date.distantPast
-            }
-        case .older:
-            return { (m1, m2) in
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd"
-                let date1 = dateFormatter.date(from: m1.releaseDate)
-                let date2 = dateFormatter.date(from: m2.releaseDate)
-                return date1 ?? Date.distantPast < date2 ?? Date.distantPast
-            }
-        }
-    }
-}
-
 class PopularMoviesViewController: UIViewController {
     // MARK: - Properties
     private let movieListView = MovieListView()
     private var selectedSortingOption: SortingOptions = .popularity
-    
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.hidesWhenStopped = true
+        return spinner
+    }()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -57,8 +29,13 @@ class PopularMoviesViewController: UIViewController {
         setUpNavBar()
         
         movieListView.delegate = self
+        movieListView.errorDelegate = self
         view.addSubview(movieListView)
         movieListView.addConstraintsToFillView(view)
+        
+        view.addSubview(spinner)
+        spinner.center(inView: view)
+        spinner.setDimensions(width: 100, height: 100)
     }
     
     private func setUpNavBar() {
@@ -84,10 +61,10 @@ class PopularMoviesViewController: UIViewController {
             (BaseConstants.Localization.sortByNew, SortingOptions.newier),
             (BaseConstants.Localization.sortByOld, SortingOptions.older)
             
-        ], currentSelection: selectedSortingOption, action: { (value) in
+        ], currentSelection: selectedSortingOption, action: { [weak self] (value) in
             if let sortingOption = value as? SortingOptions {
-                self.selectedSortingOption = sortingOption
-                self.movieListView.didChangeSortingOption(sortingOption)
+                self?.selectedSortingOption = sortingOption
+                self?.movieListView.didChangeSortingOption(sortingOption)
             }
         })
         
@@ -99,7 +76,7 @@ class PopularMoviesViewController: UIViewController {
         openSortingOptions()
     }
     
-   
+    
 }
 
 // MARK: - MovieListViewDelegate
@@ -109,42 +86,71 @@ extension PopularMoviesViewController: MovieListViewDelegate {
     }
     
     func movieListView(_ movieListView: MovieListView, didSelectMovie movie: Movie) {
-        let dispatchGroup = DispatchGroup()
-        var trailerURL: URL?
-        
-        dispatchGroup.enter()
-        ApiManager.shared.fetchMovieVideosById(id: movie.id) { result in
-            defer { dispatchGroup.leave() }
+        spinner.startAnimating()
+        if Network.reachability?.isReachable == false {
+            Alert.showNotice(viewController: self,
+                             title: BaseConstants.Localization.error,
+                             message: BaseConstants.Localization.offline)
+            spinner.stopAnimating()
+        } else {
+            let dispatchGroup = DispatchGroup()
+            var trailerURL: URL?
             
-            switch result {
-            case .success(let videoResponse):
-                if let trailerVideo = videoResponse.results.first(where: { $0.type == TypeEnum.trailer }) {
-                    let trailerKey = trailerVideo.key
-                    trailerURL = URL(string: "https://www.youtube.com/watch?v=\(trailerKey)")
+            dispatchGroup.enter()
+            ApiManager.shared.fetchMovieVideosById(id: movie.id) { [weak self] result in
+                defer { dispatchGroup.leave() }
+                
+                switch result {
+                case .success(let videoResponse):
+                    if let trailerVideo = videoResponse.results.first(where: { $0.type == TypeEnum.trailer }) {
+                        let trailerKey = trailerVideo.key
+                        trailerURL = URL(string: "https://www.youtube.com/watch?v=\(trailerKey)")
+                    }
+                case .failure(let error):
+                    print("Error fetching movie videos: \(error)")
+                    self?.spinner.stopAnimating()
+                    guard let vc = self else { return }
+                    Alert.showNotice(viewController: vc,
+                                     title: BaseConstants.Localization.error,
+                                     message: error.localizedDescription)
                 }
-            case .failure(let error):
-                print("Error fetching movie videos: \(error)")
             }
-        }
-        
-        var movieDetails: MovieDetails?
-        
-        dispatchGroup.enter()
-        ApiManager.shared.fetchMovieDetailsById(id: movie.id) { result in
-            defer { dispatchGroup.leave() }
-            switch result {
-            case .success(let movie):
-                movieDetails = movie
-            case .failure(let error):
-                print(error.localizedDescription)
+            
+            var movieDetails: MovieDetails?
+            
+            dispatchGroup.enter()
+            ApiManager.shared.fetchMovieDetailsById(id: movie.id) { [weak self] result in
+                defer { dispatchGroup.leave() }
+                switch result {
+                case .success(let movie):
+                    movieDetails = movie
+                case .failure(let error):
+                    self?.spinner.stopAnimating()
+                    print(error.localizedDescription)
+                    guard let vc = self else { return }
+                    Alert.showNotice(viewController: vc,
+                                     title: BaseConstants.Localization.error,
+                                     message: error.localizedDescription)
+                    
+                }
             }
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            guard let movieDetails = movieDetails else { return }
+            
+            dispatchGroup.notify(queue: .main) { [weak self] in
+                self?.spinner.stopAnimating()
+                guard let movieDetails = movieDetails else { return }
                 let vm = MovieDetailViewViewModel(movie: movieDetails, trailerURL: trailerURL)
                 let vc = MovieDetailsViewController(viewModel: vm)
-                self.navigationController?.pushViewController(vc, animated: true)
+                self?.navigationController?.pushViewController(vc, animated: true)
+            }
         }
+    }
+}
+
+// MARK: - MovieListViewDelegate
+extension PopularMoviesViewController: MovieListViewErrorDelegate {
+    func didEncounterError(_ error: Error) {
+        Alert.showNotice(viewController: self,
+                         title: BaseConstants.Localization.error,
+                         message: error.localizedDescription)
     }
 }

@@ -75,12 +75,6 @@ final class MovieDetailView: UIView {
         return button
     }()
     
-    //    private let spinner: UIActivityIndicatorView = {
-    //        let spinner = UIActivityIndicatorView(style: .large)
-    //        spinner.hidesWhenStopped = true
-    //        return spinner
-    //    }()
-    
     // MARK: - Lifecycle
     init(frame: CGRect, viewModel: MovieDetailViewViewModel) {
         self.viewModel = viewModel

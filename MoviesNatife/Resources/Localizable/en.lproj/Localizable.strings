@@ -19,5 +19,10 @@
 "cancel" = "Cancel";
 "dismiss" = "Dismiss";
 
-
+// MARK: Genre
 "noGenre" = "No Genre";
+
+// MARK: - Error
+"Error" = "Error";
+"offline" = "You are offline. Please, enable your Wi-Fi or connect using cellular data.";
+"ok" = "Ok";

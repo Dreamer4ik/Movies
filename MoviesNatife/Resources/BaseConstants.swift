@@ -28,6 +28,11 @@ struct BaseConstants {
         static let sortByNew = "sortByNew".localized()
         static let sortByOld = "sortByOld".localized()
         static let cancel = "cancel".localized()
+        
+        // MARK: Error
+        static let error = "Error".localized()
+        static let offline = "offline".localized()
+        static let ok = "ok".localized()
     }
 }
 

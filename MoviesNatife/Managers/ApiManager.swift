@@ -21,7 +21,7 @@ enum ApiManagerError: Error {
 typealias ApiManagerCallback<T> = (ApiManagerNetworkResult<T>) -> Void
 
 class ApiManager: NSObject {
-    static let shared = ApiManager() // fixMe
+    static let shared = ApiManager()
     let params: Parameters = ["api_key": BaseConstants.API.API_KEY]
     
     func getPopularMovies(page: Int? = nil, sortingOption: String? = nil, completionHandler: @escaping ApiManagerCallback<MoviesResponse>) {

@@ -12,6 +12,10 @@ enum ViewMode {
     case search
 }
 
+protocol MovieListViewViewModelErrorDelegate: AnyObject {
+    func didEncounterError(_ error: Error)
+}
+
 protocol MovieListViewViewModelDelegate: AnyObject {
     func didLoadInitialMovies()
     func didReloadMovies()
@@ -26,6 +30,7 @@ protocol MovieListViewViewModelDelegate: AnyObject {
 final class MovieListViewViewModel: NSObject {
     // MARK: - Properties
     weak var delegate: MovieListViewViewModelDelegate?
+    weak var errorDelegate: MovieListViewViewModelErrorDelegate?
     var viewMode: ViewMode = .regular
     private var searchText = ""
     private var currentRequest: MovieRequest?
@@ -93,6 +98,7 @@ final class MovieListViewViewModel: NSObject {
                     }
                 case .failure(let error):
                     print(error.localizedDescription)
+                    strongSelf.errorDelegate?.didEncounterError(error)
                     strongSelf.isLoadingMovies = false
                 }
             }
@@ -140,8 +146,9 @@ final class MovieListViewViewModel: NSObject {
                         strongSelf.delegate?.didLoadMoreMovies()
                         strongSelf.isLoadingMovies = false
                     }
-                case .failure(let failure):
-                    print(failure.localizedDescription)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    strongSelf.errorDelegate?.didEncounterError(error)
                     strongSelf.isLoadingMovies = false
                 }
             }
@@ -162,6 +169,7 @@ final class MovieListViewViewModel: NSObject {
                         strongSelf.isLoadingMovies = false
                     }
                 case .failure(let error):
+                    strongSelf.errorDelegate?.didEncounterError(error)
                     print(error.localizedDescription)
                 }
             }
@@ -197,8 +205,9 @@ final class MovieListViewViewModel: NSObject {
             switch result {
             case .success(let model):
                 self?.processSearchResults(model: model)
-            case .failure(let failure):
+            case .failure(let error):
                 self?.handleNoResults()
+                self?.errorDelegate?.didEncounterError(error)
             }
         }
     }

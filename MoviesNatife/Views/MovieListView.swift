@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol MovieListViewErrorDelegate: AnyObject {
+    func didEncounterError(_ error: Error)
+}
+
 protocol MovieListViewDelegate: AnyObject {
     func movieListView(
         _ movieListView: MovieListView,
@@ -19,6 +23,7 @@ protocol MovieListViewDelegate: AnyObject {
 final class MovieListView: UIView {
     // MARK: - Properties
     weak var delegate: MovieListViewDelegate?
+    weak var errorDelegate: MovieListViewErrorDelegate?
     private let viewModel = MovieListViewViewModel()
     private let searchInputView = MovieSearchInputView()
     private let noResultsView = MovieNoSearchResultsView()
@@ -99,6 +104,7 @@ final class MovieListView: UIView {
         
         setUpCollectionView()
         viewModel.delegate = self
+        viewModel.errorDelegate = self
     }
     
     private func setUpCollectionView() {
@@ -217,6 +223,7 @@ extension MovieListView: MovieSearchInputViewDelegate {
     }
 }
 
+// MARK: - MovieNoSearchResultsViewDelegate
 extension MovieListView: MovieNoSearchResultsViewDelegate {
     func didTapReturnButton() {
         viewModel.viewMode = .regular
@@ -231,5 +238,12 @@ extension MovieListView: MovieNoSearchResultsViewDelegate {
             self.collectionView.alpha = 1
         }
         animator.startAnimation()
+    }
+}
+
+// MARK: - MovieSearchInputViewDelegate
+extension MovieListView: MovieListViewViewModelErrorDelegate {
+    func didEncounterError(_ error: Error) {
+        errorDelegate?.didEncounterError(error)
     }
 }
